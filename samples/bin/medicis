@@ -1,0 +1,13 @@
+#!/usr/bin/php
+<?php
+/* This file is part of Medicis | SSITU | (c) 2021 I-is-as-I-does | MIT License */
+
+use SSITU\Medicis\MedicisCli;
+
+if (php_sapi_name() !== 'cli') {
+    exit;
+}
+require_once dirname(__DIR__,4) . '/vendor/autoload.php';
+
+$pathToCollc = dirname(__DIR__) . '/collections/';
+$MedicisCli = new MedicisCli($pathToCollc, true);

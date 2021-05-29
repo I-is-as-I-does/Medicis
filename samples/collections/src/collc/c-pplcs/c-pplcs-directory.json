@@ -1,0 +1,31 @@
+{
+  "name": "Directory",
+  "priority": 1,
+  "required": ["label", "name"],
+  "props": [
+    {
+      "method": "Label",
+      "param": ["label"]
+    },
+    {
+      "method": "String",
+      "param": ["name","Nobody Bob"]
+    },
+    {
+      "method": "RefsArray",
+      "param": ["activities", "c-pplcs-activities"]
+    },
+    {
+      "method": "EmailsArray",
+      "param": ["emails"]
+    },
+    {
+      "method": "StringsArray",
+      "param": ["addresses","10 NowhereStreet, SomeCity (us)"]
+    },
+    {
+      "method": "StringsArray",
+      "param": ["websites","http://someone-website.xyz"]
+    }
+  ]
+}

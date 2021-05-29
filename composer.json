@@ -1,0 +1,28 @@
+{
+    "name": "ssitu/medicis",
+    "description": "A PHP tool dedicated to fastforward JSON collection creation. Handles schema, sample data, translations; generates pages and menu config for UI integration; bundles collections in groups and profiles; run in CLI.",
+    "type": "library",
+    "keywords" :["php", "JSON","schema"],
+    "homepage":"https://github.com/I-is-as-I-does/MetaMedicis",
+    "license": "MIT",
+    "readme":"README.md",
+    "authors": [
+        {
+            "name": "I-is-as-I-does",
+            "email": "66915011+I-is-as-I-does@users.noreply.github.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "ssitu/jacktrades": "^2.1"
+    },
+    "suggest": {
+        "ssitu/euclid": "To run Medicis from CLI"
+    },
+    "autoload": {
+        "psr-4": {
+            "SSITU\\Medicis\\": "src",
+            "SSITU\\Medicis\\MedicisFamily\\": "src/MedicisFamily/"
+        }
+    }
+}

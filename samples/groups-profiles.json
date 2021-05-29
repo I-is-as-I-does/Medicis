@@ -1,0 +1,17 @@
+{
+    "profiles": {
+        "mainPrf": {
+            "name": "Main Profile",
+            "groups": [
+                "mainGrp"
+            ],
+            "priority": 1
+        }
+    },
+    "groups": {
+        "mainGrp": {
+            "name": "Main Group",
+            "priority": 1
+        }
+    }
+}

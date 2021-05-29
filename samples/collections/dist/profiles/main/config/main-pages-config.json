@@ -1,0 +1,20 @@
+{
+    "studio\/c-pplcs-activities": {
+        "status": "required",
+        "auth": 1,
+        "template": "collections",
+        "menu": {
+            "section": "c-pplcs",
+            "priority": 2
+        }
+    },
+    "studio\/c-pplcs-directory": {
+        "status": "required",
+        "auth": 1,
+        "template": "collections",
+        "menu": {
+            "section": "c-pplcs",
+            "priority": 1
+        }
+    }
+}
