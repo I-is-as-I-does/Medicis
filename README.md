@@ -3,7 +3,7 @@
 
 A PHP tool dedicated to fastforward JSON collection creation. 
 - Handles schema, sample data, translations
-- Generates pages and menu config for UI integration
+- Generates pages and menu config for UI integratio 
 - Bundles collections in groups and profiles
 - Run in CLI
 
@@ -80,8 +80,61 @@ Default:
 - Priority is the rank in a navigation menu, for potential use is some UI. 
    It is not required.
    
-### Schema
+### Collection
 
+The whole point of Medicis is to write Json schema (and make use of them), easy and quick.
+To create a collection:
+- in `src/collc` folder: create a sub folder, named after your group of collections, and add that group in `groups-profiles.json` config file;
+ *example*:   
+ `src/collc/pplces/`
+ and in `groups-profiles.json`:
+   ```json
+   "groups": {
+      "c-pplcs": { "name": "People and Places", "priority": 1 }
+  }
+  ```
+
+- then inside that folder, create collection json file(s); file name(s) must be 'group name' dash 'collection name';
+ *example:*
+ `c-pplcs-directory.json` and `c-pplcs-activities.json`
+
+
+Each collection file must specify 4 main properties: 
+  - `name` | *string* (default collection name in absence of translation), 
+  - `priority` | *int* (aka weight in potential UI menu; relative to group), 
+  - `required`  | *array* (required properties; will be used for schema validation),  
+  - and `props`  | *array* (schema properties).
+
+`props` items are objects, each containing 2 properties:
+-  `method`  | *string*
+- and `param`  | *array*
+
+The shortcut is within `method` and `param`: they refer to methods in *MedicisModels* that will do the heavy work.
+
+*Example:*
+`c-pplcs-activities.json`:
+```json
+{
+  "name": "Activities",
+  "priority": 2,
+  "required": ["activity"],
+  "props": [
+    {
+      "method": "String",
+      "param": ["activity", "Art historian"]
+    }
+  ]
+}
+```
+Related ethod in *MedicisModel*:
+```php
+$MedicisModels->String($id, $example, $title = false, $minLen = false, $maxLen = false, $pattern = false);
+```
+*MedicisModel* interface file will serve as a **cheat sheet** for available methods:
+`Medicis/src/MedicisFamily/MedicisModels_i.php`
+
+To generate from there a real schema + dummy data + page config (for UI) + transl, in CLI: pick `'Collections'` then `'c-pplcs-activities -> all'`.
+You'll find generated files in `dist/` folder.
 
 
 ### Translation
@@ -89,17 +142,17 @@ Default:
 For each language your are planning translations, create two files in `src/transl` folder:
 - `collections-names-{language}.json` for collections, groups and profiles names;
 - `collections-props-{language}.json` for schema properties titles.
-In CLI, run `transl` commands for either collections, groups or profiles: source translation files will automatically be populated with keys that requires translation (and you'll get a log).
+In CLI, run `'transl'` commands for either collections, groups or profiles: source translation files will automatically be populated with keys that requires translation (and you'll get a log).
 
-Note that `all` commands include translation.  
+Note that `'all'` commands include translation.  
 
 ### MetaMedicis
 
-*MedicisCli* is fine and dandy for quick, common use operations, but please note that its `all` commands are cascading.
+*MedicisCli* is fine and dandy for quick, common use operations, but please note that its `'all'` commands are cascading.
 A profile command will run action for **all its groups**, and each group will run action for **all its collections**.
 
 For more targeted operations:
--  use Euclid main tool (in which case, please refer to Euclid doc), 
+-  use *Euclid* main tool (in which case, please refer to *Euclid* doc), 
 - or operate from the *MetaMedicis* class:
 ```php
 $MedicisMap = new MedicisMap($collectionDirPath);
