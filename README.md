@@ -152,7 +152,7 @@ Note that `'all'` commands include translation.
 A profile command will run action for **all its groups**, and each group will run action for **all its collections**.
 
 For more targeted operations:
--  use *Euclid* main tool (in which case, please refer to *Euclid* doc), 
+-  use *Euclid* main tool (in which case, please refer to *Euclid* [doc](https://github.com/I-is-as-I-does/Euclid)), 
 - or operate from the *MetaMedicis* class:
 ```php
 $MedicisMap = new MedicisMap($collectionDirPath);
