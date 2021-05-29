@@ -3,7 +3,7 @@
 
 A PHP tool dedicated to fastforward JSON collection creation. 
 - Handles schema, sample data, translations
-- Generates pages and menu config for UI integratio 
+- Generates pages and menu config for UI integration
 - Bundles collections in groups and profiles
 - Run in CLI
 
