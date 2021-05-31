@@ -27,7 +27,7 @@ class MedicisMap implements MedicisMap_i
     {
         if (!is_dir($collectionDirPath)) {
             mkdir($base, 0777, true);
-            $this->log['done'][] = 'created dir. '.basename($collectionDirPath);
+            $this->log['done'][] = 'created dir. ' . basename($collectionDirPath);
         }
         $this->collectionDirPath = trim($collectionDirPath, '/\\') . '/';
 
@@ -74,15 +74,15 @@ class MedicisMap implements MedicisMap_i
             $dirpath = $this->collectionDirPath . $dirk . '/';
             if (!is_dir($dirpath)) {
                 mkdir($dirpath);
-                $this->log['done'][] = 'created dir. '.$dirk;
-                switch($dirk){
+                $this->log['done'][] = 'created dir. ' . $dirk;
+                switch ($dirk) {
                     case 'src/collc':
                         $err = 'Empty src/collc dir; cannot build anything';
                         break;
-                        case 'src/config':
-                            $this->log['default-file-write'] = $this->createDlftConfig();
-                            break;
-                                default:  
+                    case 'src/config':
+                        $this->log['default-file-write'] = $this->createDlftConfig();
+                        break;
+                    default:
                 }
             }
             $dirMap[$dirk] = $dirpath;
@@ -112,29 +112,31 @@ class MedicisMap implements MedicisMap_i
         return true;
     }
 
-    private function createDlftConfig(){
+    private function createDlftConfig()
+    {
         $deflt = [
             'profiles' => [
-              'mainPrf' => [
-                'name' => 'Main Profile',
-                'groups' => [
-                  'mainGrp',
+                'mainPrf' => [
+                    'name' => 'Main Profile',
+                    'groups' => [
+                        'mainGrp',
+                    ],
+                    'priority' => 1,
                 ],
-                'priority' => 1,
-              ],
             ],
             'groups' => [
-              'mainGrp' => [
-                'name' => 'Main Group',
-                'priority' => 1,
-              ],
+                'mainGrp' => [
+                    'name' => 'Main Group',
+                    'priority' => 1,
+                ],
             ],
         ];
         return Jack::File()->saveJson($deflt, $this->getBundlesConfigPath(), true);
     }
 
-    private function getBundlesConfigPath(){
-        return $this->collectionDirPath.'src/config/' . $this->bundlesConfigFilename . '.json';
+    private function getBundlesConfigPath()
+    {
+        return $this->collectionDirPath . 'src/config/' . $this->bundlesConfigFilename . '.json';
     }
 
     private function loadBundlesMap()

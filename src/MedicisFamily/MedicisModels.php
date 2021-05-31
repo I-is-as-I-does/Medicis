@@ -3,7 +3,7 @@
 
 namespace SSITU\Medicis\MedicisFamily;
 
-class MedicisModels implements MedicisModels_i
+class MedicisModels 
 {
     private $MedicisMap;
     private $idlen = 21;
@@ -15,75 +15,65 @@ class MedicisModels implements MedicisModels_i
         $this->idpattern = '[\w\-]{' . $this->idlen . '}';
     }
 
-    protected function processTitle($id, $title)
-    {
-        if (empty($title)) {
-            return ucfirst($id);
-        }
-        return $title;
-    }
-
-    public function BaseArray($id, $title = false)
+    public function BaseArray($id, )
     {
         $prop = [];
         $prop['$id'] = "#/properties/" . $id;
-        $prop['title'] = $this->processTitle($id, $title);
+        $id = $id;
         $prop['type'] = 'array';
         $prop["uniqueItems"] = true;
         $prop["additionalItems"] = true;
         return $prop;
     }
 
-    public function EmailsArray($id, $title = false)
+    public function EmailsArray($id, )
     {
-        $prop = $this->BaseArray($id, $title);
-        $prop["items"] = $this->Email($id . '/items', $prop['title'] . 'Items');
+        $prop = $this->BaseArray($id);
+        $prop["items"] = $this->Email($id . '/items', $id . 'Items');
         return $prop;
     }
 
-    public function RefsArray($id, $refKey, $title = false)
+    public function RefsArray($id, $refKey, )
     {
-        $prop = $this->BaseArray($id, $title);
-        $prop["items"] = $this->UniqueRef($id . '/items', $refKey, $prop['title'] . 'Refs');
+        $prop = $this->BaseArray($id);
+        $prop["items"] = $this->UniqueRef($id . '/items', $refKey, $id . 'Refs');
         return $prop;
     }
 
-    public function BoolsArray($id, $default = null, $title = false)
+    public function BoolsArray($id, $default = null, )
     {
-        $prop = $this->BaseArray($id, $title);
-        $prop["items"] = $this->Bool($id . '/items', $default, $prop['title'] . 'Items');
+        $prop = $this->BaseArray($id);
+        $prop["items"] = $this->Bool($id . '/items', $default, $id . 'Items');
         return $prop;
     }
 
-    public function StringsArray($id, $itExample, $title = false, $itMin = false, $itMax = false, $itPattern = false)
+    public function StringsArray($id, $itExample, $itMin = false, $itMax = false, $itPattern = false)
     {
-        $prop = $this->BaseArray($id, $title);
-        $prop["items"] = $this->String($id . '/items', $itExample, $prop['title'] . 'Items', $itMin, $itMax, $itPattern);
+        $prop = $this->BaseArray($id);
+        $prop["items"] = $this->String($id . '/items', $itExample, $id . 'Items', $itMin, $itMax, $itPattern);
         return $prop;
     }
 
-    public function NumbersArray($id, $title = false, $itMin = false, $itMax = false)
+    public function NumbersArray($id, $itMin = false, $itMax = false)
     {
-        $prop = $this->BaseArray($id, $title);
-        $prop["items"] = $this->Number($id . '/items', $prop['title'] . 'Items', $itMin, $itMax);
+        $prop = $this->BaseArray($id);
+        $prop["items"] = $this->Number($id . '/items', $id . 'Items', $itMin, $itMax);
         return $prop;
     }
 
     public function Label($id = 'label')
     {
-        $title = ucfirst($id);
         $example = 'Record Label';
-        $prop = $this->String($id, $example, $title);
+        $prop = $this->String($id, $example);
 
         return $prop;
-        //@label will be auto built by js with required fields
     }
 
-    public function Bool($id, $default = null, $title = false)
+    public function Bool($id, $default = null, )
     {
         $prop = [];
         $prop['$id'] = "#/properties/" . $id;
-        $prop['title'] = $this->processTitle($id, $title);
+        $id = $this->processTitle($id);
         $prop['type'] = 'boolean';
         $prop["example"] = false;
         if ($default !== null) {
@@ -94,19 +84,19 @@ class MedicisModels implements MedicisModels_i
         return $prop;
     }
 
-    public function Email($id, $title = false)
+    public function Email($id, )
     {
         $example = 'some.name@domain.xyz';
-        $prop = $this->String($id, $example, $title);
+        $prop = $this->String($id, $example);
         $prop["format"] = "email";
         return $prop;
     }
 
-    public function String($id, $example, $title = false, $minLen = false, $maxLen = false, $pattern = false)
+    public function String($id, $example, $minLen = false, $maxLen = false, $pattern = false)
     {
         $prop = [];
         $prop['$id'] = "#/properties/" . $id;
-        $prop['title'] = $this->processTitle($id, $title);
+        $id = $this->processTitle($id);
         $prop['type'] = 'string';
 
         $prop['example'] = $example;
@@ -122,11 +112,18 @@ class MedicisModels implements MedicisModels_i
         return $prop;
     }
 
-    public function Number($id, $title = false, $min = false, $max = false)
+    public function Path($id = "path"){
+        $example = 'path/to/file.ext';
+        $prop = $this->String($id, $example);
+        $prop["format"] = "uri-reference";
+        return $prop;      
+    }
+
+    public function Number($id, $min = false, $max = false)
     {
         $prop = [];
         $prop['$id'] = "#/properties/" . $id;
-        $prop['title'] = $this->processTitle($id, $title);
+        $id = $this->processTitle($id);
         $prop['type'] = 'number';
 
         if (!empty($min)) {
@@ -145,29 +142,26 @@ class MedicisModels implements MedicisModels_i
 
     public function ShortTitle($id = 'shortTitle')
     {
-        $title = 'Short Title';
         $example = 'A Short Version of Title';
         $maxLen = 50;
-        return $this->String($id, $example, $title, false, $maxLen);
+        return $this->String($id, $example, false, $maxLen);
     }
 
     public function Title($id = 'title')
     {
-        $title = 'Title';
         $example = 'A Title That Can Be As Long as Needed';
-        return $this->String($id, $example, $title);
+        return $this->String($id, $example);
     }
 
     public function Year($id = "year")
     {
-        $title = 'Year';
         $example = date('Y');
         $minLen = 4;
         $maxLen = 4;
-        return $this->String($id, $example, $title, $minLen, $maxLen);
+        return $this->String($id, $example, $minLen, $maxLen);
     }
 
-    public function UniqueRef($id, $refKey, $title = false)
+    public function UniqueRef($id, $refKey, )
     {
         $refExists = $this->MedicisMap->IdExists($refKey, 'collc');
         if ($refExists === false) {
@@ -177,7 +171,7 @@ class MedicisModels implements MedicisModels_i
         $escFilename = str_replace('-', '\-', $refKey);
         $prop = [];
         $prop['$id'] = "#/properties/" . $id;
-        $prop['title'] = $this->processTitle($id, $title);
+        $id = $this->processTitle($id);
         $prop["type"] = 'object';
         $prop["additionalProperties"] = false;
 

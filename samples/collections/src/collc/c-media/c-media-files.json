@@ -1,0 +1,25 @@
+{
+    "required": ["label", "path"],
+    "props": [
+      {
+        "method": "Label",
+        "param": []
+      },
+      {
+        "method": "Path",
+        "param": []
+      },
+      {
+        "method": "UniqueRef",
+        "param": ["credits", "c-pplcs-contacts"]
+      }
+    ],
+    "config":
+    {
+      "priority":1,
+      "status": "required",
+      "auth": 1,
+      "template": "files"
+  }
+  }
+  

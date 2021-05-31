@@ -1,0 +1,17 @@
+{
+  "collc": {
+    "name": {
+      "c-pplcs": "Personnes et Lieux",
+      "main": "Principal"
+    },
+    "prop": {
+      "label": "Étiquette",
+      "name": "Nom",
+      "activities": "Activités",
+      "activity": "Activité",
+      "emails": "Emails",
+      "addresses": "Adresses",
+      "websites": "Sites Web"
+    }
+  }
+}

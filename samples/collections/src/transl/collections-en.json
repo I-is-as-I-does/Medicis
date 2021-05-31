@@ -1,0 +1,17 @@
+{
+  "collc": {
+    "name": {
+      "c-pplcs": "People and Places",
+      "main": "Main"
+    },
+    "prop": {
+      "label": "Label",
+      "name": "Name",
+      "activities": "Activities",
+      "activity": "Activity",
+      "emails": "Emails",
+      "addresses": "Addresses",
+      "websites": "Websites"
+    }
+  }
+}
