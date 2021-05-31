@@ -26,6 +26,7 @@ class MedicisGroup implements MedicisGroup_i
         $groupCollcs = $groupInfos['collcs'];
         $rslt = [];
         $bundle = [];
+        $transl = [];
         foreach ($groupCollcs as $collcId => $collcPaths) {
             $collcBuild = $this->MetaMedicis->getMedicisMember('Collc')->collcBuild($collcId, $translToo);
             $rslt['collcs-build'][$collcId] = $collcBuild;
@@ -44,18 +45,38 @@ class MedicisGroup implements MedicisGroup_i
             }
         }
         if (!empty($bundle)) {
-            foreach ($bundle as $subDir => $collcData) {
-                if (!array_key_exists('err', $rslt[$subDir . '-bundle'])) {
-                    $bundlepath = $groupInfos['distDirPaths'][$subDir] . $groupId . '.json';
-                    $rslt[$subDir . '-bundle'] = Jack::File()->saveJson($collcData, $bundlepath, true);
-                }
-            }
+            $rslt = $this->createBundleFiles($groupId, $bundle, $rslt);
         }
 
         if ($translToo === true) {
             $rslt['transl'] = $this->MetaMedicis->getMedicisMember('Transl')->groupTranslCheck($groupId);
         }
         return $rslt;
+    }
+
+    private function createBundleFiles($groupId, $bundle, $rslt)
+    {
+        foreach ($bundle as $subDir => $collcData) {
+            if (!array_key_exists('err', $rslt[$subDir . '-bundle'])) {
+                $bundlepath = $groupInfos['distDirPaths'][$subDir] . $groupId . '.json';
+                if ($subDir != 'transl') {
+                    $rslt[$subDir . '-bundle'] = Jack::File()->saveJson($collcData, $bundlepath, true);
+                } else {
+                    $rslt[$subDir . '-bundle'] = $this->splitTransl($collcData,$bundlepath);
+                }
+            }
+        }
+        return $rslt;
+    }
+
+    private function splitTransl($collcData,$bundlepath){
+        $basePath = dirname($bundlepath).basename($bundlepath,'.json');
+        $names = [];
+        $props = [];
+        foreach($collcData as $collcId => $collcTransl){
+           
+        }
+
     }
 
 }
