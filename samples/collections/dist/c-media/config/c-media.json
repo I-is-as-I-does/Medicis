@@ -1,0 +1,8 @@
+{
+    "c-media-files": {
+        "priority": 1,
+        "status": "required",
+        "auth": 1,
+        "template": "files"
+    }
+}

@@ -3,7 +3,8 @@
 
 namespace SSITU\Medicis;
 
-class MedicisMap implements MedicisMap_i {
+class MedicisMap implements MedicisMap_i
+{
 
     private $collectionDirPath;
 
@@ -27,7 +28,7 @@ class MedicisMap implements MedicisMap_i {
 
         foreach (['buildDirMap', 'buildCollcMap'] as $initMethod) {
             $do = $this->$initMethod();
-           
+
             if ($do !== true) {
                 $this->log['err'] = $do['err'];
                 return $this->log;
@@ -109,18 +110,18 @@ class MedicisMap implements MedicisMap_i {
 
     public function getCollcMap()
     {if ($this->init) {
-       return $this->collcMap;
+        return $this->collcMap;
     }
         return false;
     }
 
     public function getCollcIndex()
     {if ($this->init) {
-       return $this->collcIndex;
+        return $this->collcIndex;
     }
         return false;
     }
- 
+
     public function getDirMap()
     {
         if ($this->init) {
@@ -128,7 +129,7 @@ class MedicisMap implements MedicisMap_i {
         }
         return false;
     }
-   
+
     public function getDir($dirKey)
     {
         if ($this->init && \array_key_exists($dirKey, $this->dirMap)) {
@@ -161,7 +162,8 @@ class MedicisMap implements MedicisMap_i {
         return false;
     }
 
-    public function getGroupId($collcId){
+    public function getGroupId($collcId)
+    {
         if ($this->collcExists($collcId)) {
             return $this->collcIndex[$collcId];
         }
@@ -181,7 +183,7 @@ class MedicisMap implements MedicisMap_i {
     {
         $infos = $this->getCollcInfos($collcId);
         if ($infos !== false) {
-           return $infos['srcPath'];
+            return $infos['srcPath'];
         }
         return false;
     }
@@ -190,7 +192,7 @@ class MedicisMap implements MedicisMap_i {
     {
         $infos = $this->getCollcInfos($collcId);
         if ($infos !== false && in_array($subDir, $this->dirStructure)) {
-           return $infos['distPaths'][$subDir];
+            return $infos['distPaths'][$subDir];
         }
         return false;
     }
@@ -202,16 +204,16 @@ class MedicisMap implements MedicisMap_i {
 
     public function getAllGroupIds()
     {
-        if ($this->init) {         
-                return array_keys($this->collcMap);
+        if ($this->init) {
+            return array_keys($this->collcMap);
         }
         return false;
     }
 
     public function getAllCollcIds()
     {
-        if ($this->init) {         
-                return array_keys($this->collcIndex);
+        if ($this->init) {
+            return array_keys($this->collcIndex);
         }
         return false;
     }

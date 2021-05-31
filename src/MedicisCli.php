@@ -33,7 +33,7 @@ class MedicisCli
         }
         if (!empty($log)) {
             echo PHP_EOL;
-            $this->Companion::msg('MedicisMap recorded some events: ','yellow');
+            $this->Companion::msg('MedicisMap recorded some events: ', 'yellow');
             $this->Companion::output($log, 'auto');
             echo PHP_EOL;
         }
@@ -53,12 +53,12 @@ class MedicisCli
     private function buildCallableMap($idK)
     {
         $mapName = $this->mainMenu[$idK];
-        $method = 'getAll'.$mapName.'Ids';
+        $method = 'getAll' . $mapName . 'Ids';
         $optprop = strtolower($mapName) . 'Opts';
         $opts = $this->$optprop;
         $callableMap = $this->backToMain;
         $items = $this->MedicisMap->$method();
-     
+
         $sk = 0;
         foreach ($items as $item) {
             $sk++;
@@ -67,7 +67,6 @@ class MedicisCli
             }
         }
         return $callableMap;
-
 
     }
 
@@ -84,14 +83,14 @@ class MedicisCli
     {
         $request = $this->callableMap[$requestk];
 
-        if(strlen(''.$requestk.'') === 1){
-            if($requestk == ','){
+        if (strlen('' . $requestk . '') === 1) {
+            if ($requestk == ',') {
                 $classProp = 'mainMenu';
             } else {
-                $classProp = strtolower($request).'CallMap';
+                $classProp = strtolower($request) . 'CallMap';
             }
-                $this->callableMap = $this->$classProp;
-                $this->currentMenu = $requestk;
+            $this->callableMap = $this->$classProp;
+            $this->currentMenu = $requestk;
             return $this->run();
         }
 
@@ -103,11 +102,11 @@ class MedicisCli
             if ($this->currentMenu == 1) {
                 $method = 'collcTranslBuild';
             } else {
-                $method = 'groupTranslCheck';               
+                $method = 'groupTranslCheck';
             }
         } else {
             $member = $this->mainMenu[$this->currentMenu];
-            $method = strtolower($member).'Build';
+            $method = strtolower($member) . 'Build';
         }
         $build = $this->MetaMedicis->getMedicisMember($member)->$method($Id);
         $requestk = $this->Companion->printRslt($build);

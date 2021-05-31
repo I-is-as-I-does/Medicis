@@ -1,0 +1,6 @@
+{
+    "priority": 1,
+    "status": "required",
+    "auth": 1,
+    "template": "collections"
+}

@@ -3,22 +3,24 @@
 
 namespace SSITU\Medicis\MedicisFamily;
 
-class MedicisModels implements MedicisModels_i {
+class MedicisModels implements MedicisModels_i
+{
     private $MedicisMap;
     public $idpattern = '[\w\-]{21}';
 
     public function __construct($MetaMedicis, $idpattern = '')
     {
         $this->MedicisMap = $MetaMedicis->getMedicisMap();
-        if(!empty($idpattern)){
+        if (!empty($idpattern)) {
             $this->setIdPattern($pattern);
         }
-        
+
     }
 
-    public function setIdPattern($pattern){     
-        if(Jack::Help()->isValidPattern($pattern)){
-            $this->idpattern = trim($pattern,'/');
+    public function setIdPattern($pattern)
+    {
+        if (Jack::Help()->isValidPattern($pattern)) {
+            $this->idpattern = trim($pattern, '/');
             return true;
         }
         return false;
@@ -27,11 +29,11 @@ class MedicisModels implements MedicisModels_i {
     private function prcTitle($id)
     {
         if (stripos($id, '/') !== false) {
-            $split = explode('/',$id);
+            $split = explode('/', $id);
             $id = array_shift($split);
 
-            foreach($split as $part) {
-                    $id .= ucfirst($part);
+            foreach ($split as $part) {
+                $id .= ucfirst($part);
             }}
         return $id;
     }
@@ -145,7 +147,7 @@ class MedicisModels implements MedicisModels_i {
     {
         $prop = [];
         $prop['$id'] = "#/properties/" . $id;
-        $prop['title'] = $this->prcTitle($id);;
+        $prop['title'] = $this->prcTitle($id);
         $prop['type'] = 'number';
 
         if (!empty($min)) {
@@ -193,14 +195,14 @@ class MedicisModels implements MedicisModels_i {
         $escFilename = str_replace('-', '\-', $refKey);
         $prop = [];
         $prop['$id'] = "#/properties/" . $id;
-        $prop['title'] = $this->prcTitle($id);;
+        $prop['title'] = $this->prcTitle($id);
         $prop["type"] = 'object';
         $prop["additionalProperties"] = false;
 
         $pointerId = 'relPointer';
         $pointerExample = $foreignFileName . '.json#/123e4567-e89b-12d3-a456-426614174000';
         $pointerPattern = '^' . $escFilename . '\.json#/' . $this->idpattern . '\$';
-        $prop["properties"][$pointerId] = $this->String($id . '/'.$pointerId, $pointerExample, false, false, $pointerPattern);
+        $prop["properties"][$pointerId] = $this->String($id . '/' . $pointerId, $pointerExample, false, false, $pointerPattern);
 
         $labelId = 'relLabel';
         $labelExample = 'Related Item Label';

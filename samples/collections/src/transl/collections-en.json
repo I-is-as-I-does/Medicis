@@ -1,11 +1,17 @@
 {
-      "collc.name.c-pplcs": "People and Places",
-      "collc.name.main": "Main",
-      "collc.prop.label": "Label",
-      "collc.prop.name": "Name",
-      "collc.prop.activities": "Activities",
-      "collc.prop.activity": "Activity",
-      "collc.prop.emails": "Emails",
-      "collc.prop.addresses": "Addresses",
-      "collc.prop.websites": "Websites"
+    "collc.name.c-media": "",
+    "collc.name.c-media-files": "",
+    "collc.name.c-pplcs": "People and Places",
+    "collc.name.c-pplcs-activities": "",
+    "collc.name.c-pplcs-contacts": "",
+    "collc.name.main": "Main",
+    "collc.prop.activities": "Activities",
+    "collc.prop.activity": "Activity",
+    "collc.prop.addresses": "Addresses",
+    "collc.prop.credits": "",
+    "collc.prop.emails": "Emails",
+    "collc.prop.label": "Label",
+    "collc.prop.name": "Name",
+    "collc.prop.path": "",
+    "collc.prop.websites": "Websites"
 }

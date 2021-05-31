@@ -5,7 +5,8 @@ namespace SSITU\Medicis\MedicisFamily;
 
 use SSITU\JackTrades\Jack;
 
-class MedicisTransl implements MedicisTransl_i {
+class MedicisTransl implements MedicisTransl_i
+{
 
     private $MetaMedicis;
     private $mainTranslPath;
@@ -19,9 +20,9 @@ class MedicisTransl implements MedicisTransl_i {
         $this->mainTranslPath = $MetaMedicis->getMedicisMap()->getDir('src/transl');
     }
 
-    public function collcTranslBuild($collcId,$sch = [])
+    public function collcTranslBuild($collcId, $sch = [])
     {
-        $sch = $this->MetaMedicis->quickCheckSchema($collcId,$sch = []);
+        $sch = $this->MetaMedicis->quickCheckSchema($collcId, $sch = []);
         if (array_key_exists('err', $sch)) {
             return $sch;
         }
@@ -50,10 +51,10 @@ class MedicisTransl implements MedicisTransl_i {
 
     private function prcDoneAndTodo($itemIds, $trslKey, $saveId = false)
     {
-       
+
         $files = glob($this->mainTranslPath . 'collections-*.json');
-        if(empty($files)){
-            return ["anomaly"=> "No translation files found"];
+        if (empty($files)) {
+            return ["anomaly" => "No translation files found"];
         }
         $rslt = [];
         foreach ($files as $path) {
@@ -77,10 +78,10 @@ class MedicisTransl implements MedicisTransl_i {
             }
             if (!empty($rslt[$lang]['todo'])) {
                 $rslt[$lang]['todo'] = implode("; ", $rslt[$lang]['todo']);
-                if($saveFile){
-                ksort($content);
-                $rslt[$lang]['file-update'] = Jack::File()->saveJson($content, $path, true);
-            }
+                if ($saveFile) {
+                    ksort($content);
+                    $rslt[$lang]['file-update'] = Jack::File()->saveJson($content, $path, true);
+                }
             } else {
                 $rslt[$lang]['success'] = "all done";
                 if ($saveId !== false) {
@@ -94,7 +95,7 @@ class MedicisTransl implements MedicisTransl_i {
 
     private function extractLang($path)
     {
-        $parts = explode('-', basename($path,'.json'));
+        $parts = explode('-', basename($path, '.json'));
         return array_pop($parts);
     }
 

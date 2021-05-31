@@ -53,7 +53,7 @@ class MedicisCollc implements MedicisCollc_i
         $data = [];
         foreach ($props as $k => $v) {
             if ($v['type'] == 'object') {
-                $data[$k] = $this->iterateOnSchProps($v['properties'],$targ);
+                $data[$k] = $this->iterateOnSchProps($v['properties'], $targ);
             } else {
                 if ($v['type'] == 'array') {
                     $v = $v['items'];

@@ -3,9 +3,8 @@
 
 namespace SSITU\Medicis\MedicisFamily;
 
-use SSITU\JackTrades\Jack;
-
-class MedicisSchema implements MedicisSchema_i {
+class MedicisSchema implements MedicisSchema_i
+{
 
     private $MetaMedicis;
     private $MedicisModels;
@@ -18,8 +17,8 @@ class MedicisSchema implements MedicisSchema_i {
 
     public function schBuild($collcId, $src = [])
     {
-        $src = $this->MetaMedicis->quickCheckSrc($collcId,$src);
-        if(array_key_exists('err',$src)){
+        $src = $this->MetaMedicis->quickCheckSrc($collcId, $src);
+        if (array_key_exists('err', $src)) {
             return $src;
         }
 
@@ -36,7 +35,7 @@ class MedicisSchema implements MedicisSchema_i {
         if ($check !== true) {
             return $check;
         }
-      
+
         return $this->schWrap($collcId, $required, $props);
     }
 
@@ -61,19 +60,19 @@ class MedicisSchema implements MedicisSchema_i {
 
         $props = [];
         foreach ($src['props'] as $k => $info) {
-           
+
             if (empty($info['method'])) {
-                return ['err' => 'A MedicisModels method has not been specified for prop n."' . $k+1 . '"'];
+                return ['err' => 'A MedicisModels method has not been specified for prop n."' . $k + 1 . '"'];
             }
             $method = $info['method'];
-            
+
             if (empty($info['param'])) {
                 $info['param'] = [lcfirst($method)];
             }
-            
+
             $param = $info['param'];
             $id = $param[0];
-            
+
             if (!method_exists($this->MedicisModels, $method)) {
                 return ['err' => 'method "' . $method . '" does not exist in MedicisModels'];
             }
@@ -90,13 +89,13 @@ class MedicisSchema implements MedicisSchema_i {
                 $logErr[] = 'Unvalid schema property: ' . $k . '; ' . $prop;
             }
         }
-        if(!empty($required)){
-        foreach ($required as $propk) {
-            if (!array_key_exists($propk, $props)) {
-                $logErr[] = 'Missing required schema property: ' . $propk;
+        if (!empty($required)) {
+            foreach ($required as $propk) {
+                if (!array_key_exists($propk, $props)) {
+                    $logErr[] = 'Missing required schema property: ' . $propk;
+                }
             }
         }
-    }
         if (empty($logErr)) {
             return true;
         }
