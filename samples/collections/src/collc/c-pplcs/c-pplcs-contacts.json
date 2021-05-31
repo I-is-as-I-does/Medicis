@@ -1,11 +1,9 @@
 {
-  "name": "Directory",
-  "priority": 1,
   "required": ["label", "name"],
   "props": [
     {
       "method": "Label",
-      "param": ["label"]
+      "param": []
     },
     {
       "method": "String",
@@ -27,5 +25,12 @@
       "method": "StringsArray",
       "param": ["websites","http://someone-website.xyz"]
     }
-  ]
+  ],
+  "config":
+  {
+    "priority":1,
+    "status": "required",
+    "auth": 1,
+    "template": "collections"
+}
 }

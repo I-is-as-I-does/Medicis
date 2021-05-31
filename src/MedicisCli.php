@@ -15,12 +15,12 @@ class MedicisCli
 
     private $callableMap;
     private $backToMain = [',' => 'Main Menu' . PHP_EOL];
-    private $mapNames = [1 => 'collc', 2 => 'group', 3 => 'profl'];
-    private $mainMenu = [1 => 'Collections', 2 => "Groups", 3 => "Profiles"];
-    private $proflOpts = ["all", 'transl'];
+    private $mainMenu = [1 => 'Collc', 2 => "Group"];
     private $groupOpts = ["all", 'transl'];
     private $collcOpts = ['all', 'transl'];
     private $divider = ' -> ';
+    private $groupCallMap;
+    private $collcCallMap;
 
     public function __construct($collectionDirPath, $runBuild = false)
     {
@@ -31,12 +31,18 @@ class MedicisCli
             $this->Companion::output($log);
             exit;
         }
-        if (!empty($log['anomalies'])) {
-            $anomlMsg = 'MedicisMap recorded some non-critic anomalies: ' . PHP_EOL . implode(PHP_EOL, $this->MedicisMap['anomalies']);
-            $this->Companion::msg($anomlMsg, 'yellow');
+        if (!empty($log)) {
+            echo PHP_EOL;
+            $this->Companion::msg('MedicisMap recorded some events: ', 'yellow');
+            $this->Companion::output($log, 'auto');
+            echo PHP_EOL;
         }
 
         $this->MetaMedicis = new MetaMedicis($this->MedicisMap);
+
+        $this->groupCallMap = $this->buildCallableMap(2);
+        $this->collcCallMap = $this->buildCallableMap(1);
+
         $this->callableMap = $this->mainMenu;
 
         if ($runBuild) {
@@ -44,22 +50,23 @@ class MedicisCli
         }
     }
 
-    private function setCallableMap($idK)
+    private function buildCallableMap($idK)
     {
-        $mapName = $this->mapNames[$idK];
-        $optprop = $mapName . 'Opts';
+        $mapName = $this->mainMenu[$idK];
+        $method = 'getAll' . $mapName . 'Ids';
+        $optprop = strtolower($mapName) . 'Opts';
         $opts = $this->$optprop;
         $callableMap = $this->backToMain;
-        $items = $this->MedicisMap->getMap($mapName);
+        $items = $this->MedicisMap->$method();
+
         $sk = 0;
-        foreach ($items as $Id => $Infos) {
+        foreach ($items as $item) {
             $sk++;
             foreach ($opts as $k => $opt) {
-                $callableMap[$sk . ($k + 1)] = $Id . $this->divider . $opt;
+                $callableMap[$sk . ($k + 1)] = $item . $this->divider . $opt;
             }
         }
-        $this->callableMap = $callableMap;
-        $this->currentMenu = $idK;
+        return $callableMap;
 
     }
 
@@ -74,37 +81,34 @@ class MedicisCli
 
     protected function handleCmd($requestk)
     {
-        if (strlen('' . $requestk . '') == 1) {
-            if (array_key_exists($requestk, $this->mapNames)) {
-                $this->setCallableMap($requestk);
+        $request = $this->callableMap[$requestk];
+
+        if (strlen('' . $requestk . '') === 1) {
+            if ($requestk == ',') {
+                $classProp = 'mainMenu';
             } else {
-                $this->callableMap = $this->mainMenu;
+                $classProp = strtolower($request) . 'CallMap';
             }
+            $this->callableMap = $this->$classProp;
+            $this->currentMenu = $requestk;
             return $this->run();
         }
-        $request = $this->callableMap[$requestk];
+
         $split = explode($this->divider, $request);
         $Id = $split[0];
         $opt = $split[1];
         if ($opt === 'transl') {
-            if ($this->currentMenu === 1) {
-                $build = $this->MetaMedicis->getMedicisMember('Transl')->collcTranslBuild($Id);
+            $member = ucfirst($opt);
+            if ($this->currentMenu == 1) {
+                $method = 'collcTranslBuild';
             } else {
-                $build = $this->MetaMedicis->getMedicisMember('Transl')->bundleTranslCheck($Id);
+                $method = 'groupTranslCheck';
             }
         } else {
-            switch ($this->currentMenu) {
-                case '1':
-                    $build = $this->MetaMedicis->getMedicisMember('Collc')->collcBuild($Id, true);
-                    break;
-                case '2':
-                    $build = $this->MetaMedicis->getMedicisMember('Group')->groupBuild($Id, true);
-                    break;
-                case '3':
-                    $build = $this->MetaMedicis->getMedicisMember('Profile')->profileBuild($Id, true);
-                    break;
-            }
+            $member = $this->mainMenu[$this->currentMenu];
+            $method = strtolower($member) . 'Build';
         }
+        $build = $this->MetaMedicis->getMedicisMember($member)->$method($Id);
         $requestk = $this->Companion->printRslt($build);
         $this->handleCmd($requestk);
     }

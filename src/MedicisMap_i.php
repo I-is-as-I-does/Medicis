@@ -5,13 +5,20 @@ namespace SSITU\Medicis;
 
 interface MedicisMap_i
 {
-    public function __construct($collectionsDirPath);
+    public function __construct($collectionDirPath);
     public function getLog();
-    public function getMap($mapName);
-    public function extractGroupId($collcId);
-    public function IdExists($Id, $mapName);
-    public function getInfos($Id, $mapName, $infokey = false);
-    public function getDistDirStruct();
+    public function getCollcMap();
+    public function getCollcIndex();
+    public function getDirMap();
     public function getDir($dirKey);
-    public function getAllIdsOfMap($mapName);
+    public function collcExists($collcId);
+    public function groupExists($groupId);
+    public function getGroupInfos($groupId);
+    public function getGroupId($collcId);
+    public function getCollcInfos($collcId);
+    public function getCollcSrcPath($collcId);
+    public function getCollcDistPath($collcId, $subDir);
+    public function getDistDirStruct();
+    public function getAllGroupIds();
+    public function getAllCollcIds();
 }

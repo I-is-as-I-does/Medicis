@@ -11,10 +11,8 @@ class MedicisTransl implements MedicisTransl_i
     private $MetaMedicis;
     private $mainTranslPath;
     private $trslprfx = 'collc.'; //@doc: prefix of keys in transl files, to avoid conflicts when possibly merging different transl sources (for offline caching for ex)
-    private $propsKey = 'prop';
-    private $namesKey = 'name';
-
-    private $logRslt = [];
+    private $propsKey = 'prop.';
+    private $namesKey = 'name.';
 
     public function __construct($MetaMedicis)
     {
@@ -22,13 +20,12 @@ class MedicisTransl implements MedicisTransl_i
         $this->mainTranslPath = $MetaMedicis->getMedicisMap()->getDir('src/transl');
     }
 
-    public function collcTranslBuild($SchPathOrId)
+    public function collcTranslBuild($collcId, $sch = [])
     {
-        $sch = $this->MetaMedicis->getSchema($SchPathOrId);
+        $sch = $this->MetaMedicis->quickCheckSchema($collcId, $sch = []);
         if (array_key_exists('err', $sch)) {
             return $sch;
         }
-        $collcId = substr($sch['$id'], 0, -5);
         $propIds = array_keys($sch['properties']);
         $rslt = [];
         $rslt['properties'] = $this->prcDoneAndTodo($propIds, $this->propsKey, $collcId);
@@ -36,9 +33,9 @@ class MedicisTransl implements MedicisTransl_i
         return $rslt;
     }
 
-    public function bundleTranslCheck($GroupOrProfileId)
+    public function groupTranslCheck($GroupId)
     {
-        return $this->prcDoneAndTodo([$GroupOrProfileId], $this->namesKey);
+        return $this->prcDoneAndTodo([$GroupId], $this->namesKey);
     }
 
     private function fillDoneAndTodo($content, $trkey, $path)
@@ -46,22 +43,18 @@ class MedicisTransl implements MedicisTransl_i
         $rslt = [];
         if (empty($content) || empty($content[$trkey])) {
             $rslt['rslt'] = '[todo]'; //@doc: [] to avoid case of 'todo' translation
-            if (!array_key_exists($trkey, $content)) {
-                $content[$trkey] = '';
-                $rslt['file-update'] = Jack::File()->saveJson($content, $path, true);
-            }
         } else {
             $rslt['rslt'] = $content[$trkey];
         }
         return $rslt;
     }
 
-    private function prcDoneAndTodo($itemIds, $fileNameKey, $saveId = false)
+    private function prcDoneAndTodo($itemIds, $trslKey, $saveId = false)
     {
-       
-        $files = glob($this->mainTranslPath . 'collections-' . $fileNameKey . 's-*.json');
-        if(empty($files)){
-            return ["anomaly"=> "No translation files found"];
+
+        $files = glob($this->mainTranslPath . 'collections-*.json');
+        if (empty($files)) {
+            return ["anomaly" => "No translation files found"];
         }
         $rslt = [];
         foreach ($files as $path) {
@@ -69,13 +62,15 @@ class MedicisTransl implements MedicisTransl_i
             $lang = $this->extractLang($path);
             $rslt[$lang] = [];
             $saveStock = [];
+            $saveFile = false;
             foreach ($itemIds as $itemId) {
-                $trkey = $this->trslprfx . $fileNameKey . '.' . $itemId;
+                $trkey = $this->trslprfx . $trslKey . $itemId;
                 $subPrc = $this->fillDoneAndTodo($content, $trkey, $path);
                 if ($subPrc['rslt'] === '[todo]') {
                     $rslt[$lang]['todo'][] = $itemId;
-                    if (!empty($subPrc['file-update'])) {
-                        $rslt[$lang]['file-update'] = $subPrc['file-update'];
+                    if (!array_key_exists($trkey, $content)) {
+                        $content[$trkey] = '';
+                        $saveFile = true;
                     }
                 } elseif ($saveId !== false) {
                     $saveStock[$trkey] = $subPrc['rslt'];
@@ -83,9 +78,14 @@ class MedicisTransl implements MedicisTransl_i
             }
             if (!empty($rslt[$lang]['todo'])) {
                 $rslt[$lang]['todo'] = implode("; ", $rslt[$lang]['todo']);
+                if ($saveFile) {
+                    ksort($content);
+                    $rslt[$lang]['file-update'] = Jack::File()->saveJson($content, $path, true);
+                }
             } else {
                 $rslt[$lang]['success'] = "all done";
                 if ($saveId !== false) {
+                    ksort($saveStock);
                     $rslt[$lang]['save-transl'] = $this->MetaMedicis->saveDistFile($saveStock, $saveId, 'transl');
                 }
             }
@@ -93,9 +93,9 @@ class MedicisTransl implements MedicisTransl_i
         return $rslt;
     }
 
-    private function extractLang($file)
+    private function extractLang($path)
     {
-        $parts = explode('-', trim($file, '.json'));
+        $parts = explode('-', basename($path, '.json'));
         return array_pop($parts);
     }
 

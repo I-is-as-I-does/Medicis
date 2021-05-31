@@ -6,5 +6,5 @@ namespace SSITU\Medicis\MedicisFamily;
 interface MedicisSchema_i
 {
     public function __construct($MetaMedicis);
-    public function schBuild($collcId);
+    public function schBuild($collcId, $src = array());
 }

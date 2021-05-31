@@ -9,102 +9,53 @@ class MedicisGroup implements MedicisGroup_i
 {
     private $MetaMedicis;
     private $MedicisMap;
-    private $distDirStruct;
-
+    private $dirStruc;
     public function __construct($MetaMedicis)
     {
         $this->MetaMedicis = $MetaMedicis;
         $this->MedicisMap = $MetaMedicis->getMedicisMap();
-        $this->distDirStruct = $this->MedicisMap->getDistDirStruct();
+        $this->dirStruc = $this->MedicisMap->getDistDirStruct();
     }
 
     public function groupBuild($groupId, $translToo = true)
     {
-
-        $groupInfos = $this->MetaMedicis->getBundleInfos($groupId, 'group');
+        $groupInfos = $this->MedicisMap->getGroupInfos($groupId);
         if (array_key_exists('err', $groupInfos)) {
             return $groupInfos;
         }
+        $groupCollcs = $groupInfos['collcs'];
         $rslt = [];
-        foreach ($groupInfos['collcIds'] as $collcId) {
-            $rslt['collcs'][$collcId] = $this->MetaMedicis->getMedicisMember('Collc')->collcBuild($collcId, $translToo);
-        }
-        $rslt['config'] = $this->buildGroupConfig($groupId, $groupInfos);
-        if ($translToo === true) {
-            $rslt['transl'] = $this->MetaMedicis->getMedicisMember('Transl')->bundleTranslCheck($groupId);
-        }
-        return $rslt;
-    }
-
-    public function buildGroupConfig($groupId, $groupInfos = false)
-    {if (empty($groupInfos)) {
-        $groupInfos = $this->MetaMedicis->getBundleInfos($groupId, 'group');
-        if (array_key_exists('err', $groupInfos)) {
-            return $groupInfos;
-        }
-    }
-        $rslt = [];
-        $config = [];
-        $paths = $this->getRelCollcsFilePaths($groupId);
-        $configPaths = $paths['config'];
-        unset($paths['config']);
-        $config['paths'] = $paths;
-        $jobs = ['pages' => [$configPaths, $groupInfos['collcIds']], 'section' => [$groupId, $groupInfos['name'], $groupInfos['priority']]];
-        foreach ($jobs as $jobk => $jobParams) {
-            $method = 'get' . ucfirst($jobk) . 'Config';
-            $do = $this->$method(...$jobParams);
-            if (!empty($do['log'])) {
-                $rslt[$jobk . '-log'] = $do['log'];
-            }
-            $config[$jobk] = $do['config'];
-        }
-        $rslt['save'] = $this->MetaMedicis->saveDistFile($config, $groupId, 'config');
-        return $rslt;
-    }
-
-    private function getRelCollcsFilePaths($groupId)
-    {
-        $paths = [];
-        foreach ($this->distDirStruct as $dirK) {
-            $paths[$dirK] = glob($this->MedicisMap->getDir('dist/partials/' . $dirK) . $groupId . '-*-*.json');
-        }
-        return $paths;
-    }
-
-    private function getPagesConfig($configPaths, $collcIds)
-    {
-
-        $log = [];
-        $pages = [];
-        foreach ($configPaths as $file) {
-            $content = Jack::File()->readJson($file);
-            if (empty($content)) {
-                $log['err'][] = 'unvalid json or path: ' . $file;
-            } else {
-                $collcId = basename($file, '-config.json');
-                $searchkey = array_search($collcId, $collcIds);
-                if ($searchkey === false) {
-                    $log['err'][] = $collcId . ' is not in map';
-                } else {
-                    unset($collcIds[$searchkey]);
-                    $pages = array_merge($pages, $content);
+        $bundle = [];
+        foreach ($groupCollcs as $collcId => $collcPaths) {
+            $collcBuild = $this->MetaMedicis->getMedicisMember('Collc')->collcBuild($collcId, $translToo);
+            $rslt['collcs-build'][$collcId] = $collcBuild;
+            if (!array_key_exists('err', $collcBuild)) {
+                foreach ($this->dirStruc as $subDir) {
+                    $rslt[$subDir . '-bundle'] = [];
+                    if (array_key_exists('success', $collcBuild[$subDir]) && ($translToo || $subDir !== 'transl')) {
+                        $content = $this->MetaMedicis->getCollcFile($collcPaths['distPaths'][$subDir]);
+                        if (!array_key_exists('err', $content)) {
+                            $bundle[$subDir][$collcId] = $content;
+                        } else {
+                            $rslt[$subDir . '-bundle']['err'][$collcId] = $content;
+                        }
+                    }
                 }
             }
         }
-        if (!empty($collcIds)) {
-            $log['todo'] = implode('; ', $collcIds);
+        if (!empty($bundle)) {
+            foreach ($bundle as $subDir => $collcData) {
+                if (!array_key_exists('err', $rslt[$subDir . '-bundle'])) {
+                    $bundlepath = $groupInfos['distDirPaths'][$subDir] . $groupId . '.json';
+                    $rslt[$subDir . '-bundle'] = Jack::File()->saveJson($collcData, $bundlepath, true);
+                }
+            }
         }
-        return ['log' => $log, 'config' => $pages];
 
-    }
-
-    private function getSectionConfig($groupId, $groupName, $groupPriority)
-    {
-        $section = [];
-        $section[$groupId]['header'] = $groupName;
-        $section[$groupId]['bloc'] = 'studio';
-        $section[$groupId]['priority'] = $groupPriority;
-        return ['config' => $section];
+        if ($translToo === true) {
+            $rslt['transl'] = $this->MetaMedicis->getMedicisMember('Transl')->groupTranslCheck($groupId);
+        }
+        return $rslt;
     }
 
 }

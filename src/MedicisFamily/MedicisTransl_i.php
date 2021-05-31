@@ -6,6 +6,6 @@ namespace SSITU\Medicis\MedicisFamily;
 interface MedicisTransl_i
 {
     public function __construct($MetaMedicis);
-    public function collcTranslBuild($SchPathOrId);
-    public function bundleTranslCheck($GroupOrProfileId);
+    public function collcTranslBuild($collcId, $sch = array());
+    public function groupTranslCheck($GroupId);
 }

@@ -7,7 +7,7 @@ interface MedicisCollc_i
 {
     public function __construct($MetaMedicis);
     public function collcBuild($collcId, $translToo = true);
-    public function pageConfigBuild($collcId, $groupId, $priority);
+    public function collcConfigBuild($collcId, $src = array());
     public function iterateOnSchProps($props, $targ);
-    public function dummyDataBuild($SchPathOrId);
+    public function dummyDataBuild($collcId, $sch = array());
 }

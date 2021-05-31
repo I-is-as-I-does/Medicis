@@ -1,0 +1,47 @@
+{
+    "$schema": "http:\/\/json-schema.org\/draft-07\/schema",
+    "$id": "c-media-files.json",
+    "title": "c-media-files",
+    "type": "object",
+    "required": [
+        "label",
+        "path"
+    ],
+    "properties": {
+        "label": {
+            "$id": "#\/properties\/label",
+            "title": "label",
+            "type": "string",
+            "example": "Record Label"
+        },
+        "path": {
+            "$id": "#\/properties\/path",
+            "title": "path",
+            "type": "string",
+            "example": "path\/to\/file.ext",
+            "format": "uri-reference"
+        },
+        "credits": {
+            "$id": "#\/properties\/credits",
+            "title": "credits",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "relPointer": {
+                    "$id": "#\/properties\/credits\/relPointer",
+                    "title": "creditsRelPointer",
+                    "type": "string",
+                    "example": "c-pplcs-contacts-data.json#\/123e4567-e89b-12d3-a456-426614174000",
+                    "pattern": "^c\\-pplcs\\-contacts\\.json#\/[\\w\\-]{21}\\$"
+                },
+                "relLabel": {
+                    "$id": "#\/properties\/credits\/relLabel",
+                    "title": "creditsRelLabel",
+                    "type": "string",
+                    "example": "Related Item Label"
+                }
+            }
+        }
+    },
+    "additionalProperties": false
+}

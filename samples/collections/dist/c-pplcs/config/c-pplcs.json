@@ -1,0 +1,14 @@
+{
+    "c-pplcs-activities": {
+        "priority": 2,
+        "status": "required",
+        "auth": 1,
+        "template": "collections"
+    },
+    "c-pplcs-contacts": {
+        "priority": 1,
+        "status": "required",
+        "auth": 1,
+        "template": "collections"
+    }
+}

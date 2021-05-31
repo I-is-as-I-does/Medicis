@@ -1,15 +1,20 @@
 {
-  "name": "Activities",
-  "priority": 2,
   "required": ["label", "activity"],
   "props": [
     {
       "method": "Label",
-      "param": ["label"]
+      "param": []
     },
     {
       "method": "String",
       "param": ["activity", "Art historian"]
     }
-  ]
+  ],
+  "config":
+  {
+    "priority":2,
+    "status": "required",
+    "auth": 1,
+    "template": "collections"
+}
 }

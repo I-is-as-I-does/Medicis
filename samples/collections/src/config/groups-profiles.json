@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "main": { "name": "Main Profile", "groups": ["c-pplcs"], "priority": 1 }
-  },
-  "groups": {
-    "c-pplcs": { "name": "People and Places", "priority": 1 }
-  }
-}

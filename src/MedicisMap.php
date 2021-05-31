@@ -3,20 +3,15 @@
 
 namespace SSITU\Medicis;
 
-use SSITU\JackTrades\Jack;
-
 class MedicisMap implements MedicisMap_i
 {
 
     private $collectionDirPath;
 
-    private $bundlesConfigFilename = 'groups-profiles';
-
     private $dirStructure = ['config', 'data', 'sch', 'transl'];
 
     private $dirMap = [];
-    private $groupMap = [];
-    private $proflMap = [];
+    private $collcIndex = [];
     private $collcMap = [];
 
     private $log = [];
@@ -27,12 +22,13 @@ class MedicisMap implements MedicisMap_i
     {
         if (!is_dir($collectionDirPath)) {
             mkdir($base, 0777, true);
-            $this->log['done'][] = 'created dir. '.basename($collectionDirPath);
+            $this->log['done'][] = 'created dir. ' . basename($collectionDirPath);
         }
         $this->collectionDirPath = trim($collectionDirPath, '/\\') . '/';
 
-        foreach (['buildDirMap', 'loadBundlesMap', 'completeGrpConfig', 'buildCollcMap'] as $initMethod) {
+        foreach (['buildDirMap', 'buildCollcMap'] as $initMethod) {
             $do = $this->$initMethod();
+
             if ($do !== true) {
                 $this->log['err'] = $do['err'];
                 return $this->log;
@@ -42,111 +38,68 @@ class MedicisMap implements MedicisMap_i
 
     private function buildCollcMap()
     {
-        $collcMap = [];
-        $files = glob($this->dirMap['src/collc'] . '*/*.json');
+        $this->collcMap = [];
+        $this->collcIndex = [];
+        $groupPaths = glob($this->dirMap['src/collc'] . '*/', GLOB_ONLYDIR);
+        foreach ($groupPaths as $groupPath) {
+            $groupId = basename($groupPath);
+            $srcPaths = glob($groupPath . '*.json');
+            $distDirPaths = $this->groupDistPaths($groupId);
+            $this->collcMap[$groupId]['distDirPaths'] = $distDirPaths;
 
-        foreach ($files as $file) {
-            $Id = basename($file, '.json');
-            $groupId = $this->extractGroupId($Id);
+            foreach ($srcPaths as $srcPath) {
+                $collcId = basename($srcPath, '.json');
+                $this->collcIndex[$collcId] = $groupId;
 
-            if (!array_key_exists($groupId, $this->groupMap)) {
-                return ['err' => 'group "' . $groupId . '" is not listed in "' . $this->bundlesConfigFilename . '" config file'];
+                $this->collcMap[$groupId]['collcs'][$collcId]['srcPath'] = $srcPath;
+                $this->collcMap[$groupId]['collcs'][$collcId]['distPaths'] = $this->collcDistPaths($distDirPaths, $collcId);
             }
-
-            $this->groupMap[$groupId]['collcIds'][] = $Id;
-            $collcMap[$Id]['path'] = $file;
-            $collcMap[$Id]['groupId'] = $groupId;
-            $collcMap[$Id]['groupName'] = $this->groupMap[$groupId]['name'];
-
         }
-        $this->collcMap = $collcMap;
         return true;
+    }
+
+    private function collcDistPaths($distDirPaths, $collcId)
+    {
+        $collcDistPaths = [];
+        foreach ($distDirPaths as $subDir => $distPath) {
+            $collcDistPaths[$subDir] = $distPath . $collcId . '-' . $subDir . '.json';
+        }
+        return $collcDistPaths;
+    }
+
+    private function groupDistPaths($groupId)
+    {
+        $distDirPaths = [];
+        $baseDistPath = $this->dirMap['dist'] . $groupId . '/';
+        foreach ($this->dirStructure as $subDir) {
+            $subDirPath = $baseDistPath . $subDir . '/';
+            $distDirPaths[$subDir] = $subDirPath;
+            if (!is_dir($subDirPath)) {
+                mkdir($subDirPath, 0777, true);
+                $this->log['done'][] = 'created dir. dist/' . $groupId . '/' . $subDir;
+            }
+        }
+        return $distDirPaths;
     }
 
     private function buildDirMap()
     {
-        $dirs = ['dist', 'src', 'src/collc', 'src/transl', 'src/config', 'dist/profiles', 'dist/partials'];
-        foreach ($this->dirStructure as $subDir) {
-            $dirs[] = 'dist/partials/' . $subDir;
-        }
-
+        $dirs = ['dist', 'src', 'src/collc', 'src/transl'];
         foreach ($dirs as $dirk) {
             $dirpath = $this->collectionDirPath . $dirk . '/';
             if (!is_dir($dirpath)) {
                 mkdir($dirpath);
-                $this->log['done'][] = 'created dir. '.$dirk;
-                switch($dirk){
-                    case 'src/collc':
-                        $err = 'Empty src/collc dir; cannot build anything';
-                        break;
-                        case 'src/config':
-                            $this->log['default-file-write'] = $this->createDlftConfig();
-                            break;
-                                default:  
+                $this->log['done'][] = 'created dir. ' . $dirk;
+                if ($dirk == 'src/collc') {
+                    $err = 'Empty src/collc dir; cannot build anything';
                 }
             }
-            $dirMap[$dirk] = $dirpath;
+            $this->dirMap[$dirk] = $dirpath;
         }
         if (isset($err)) {
             return ['err' => $err];
         }
-
-        $this->dirMap = $dirMap;
         $this->init = true;
-        return true;
-    }
-
-    private function completeGrpConfig()
-    {
-        foreach ($this->groupMap as $groupId => $groupInfos) {
-            if (!array_key_exists('name', $groupInfos)) {
-                return ['err' => 'group "' . $groupId . '" is missing its name property'];
-            }
-            if (!array_key_exists('priority', $groupInfos)) {
-                $this->groupMap[$groupId]['priority'] = 99;
-                $this->log['anomalies'][] = $groupId . ' is missing its priority property';
-            }
-            $this->groupMap[$groupId]['collcIds'] = [];
-        }
-
-        return true;
-    }
-
-    private function createDlftConfig(){
-        $deflt = [
-            'profiles' => [
-              'mainPrf' => [
-                'name' => 'Main Profile',
-                'groups' => [
-                  'mainGrp',
-                ],
-                'priority' => 1,
-              ],
-            ],
-            'groups' => [
-              'mainGrp' => [
-                'name' => 'Main Group',
-                'priority' => 1,
-              ],
-            ],
-        ];
-        return Jack::File()->saveJson($deflt, $this->getBundlesConfigPath(), true);
-    }
-
-    private function getBundlesConfigPath(){
-        return $this->collectionDirPath.'src/config/' . $this->bundlesConfigFilename . '.json';
-    }
-
-    private function loadBundlesMap()
-    {
-        $config = Jack::File()->readJson($this->getBundlesConfigPath());
-
-        if (empty($config) || empty($config['groups']) || empty($config['profiles'])) {
-            return ['err' => 'groups and profiles config file either not found or invalid'];
-        }
-
-        $this->proflMap = $config['profiles'];
-        $this->groupMap = $config['groups'];
         return true;
     }
 
@@ -155,49 +108,26 @@ class MedicisMap implements MedicisMap_i
         return $this->log;
     }
 
-    public function getMap($mapName)
+    public function getCollcMap()
     {if ($this->init) {
-        if (in_array($mapName, ['group', 'collc', 'profl'])) {
-            $propname = $mapName . 'Map';
-            return $this->$propname;
-        }
+        return $this->collcMap;
     }
         return false;
     }
 
-    public function extractGroupId($collcId)
-    {
-        $split = explode('-', $collcId);
-        array_pop($split);
-        return implode('-', $split);
+    public function getCollcIndex()
+    {if ($this->init) {
+        return $this->collcIndex;
     }
-
-    public function IdExists($Id, $mapName)
-    {
-        $pool = $this->getMap($mapName);
-        if ($pool !== false && array_key_exists($Id, $pool)) {
-            return true;
-        }
         return false;
     }
 
-    public function getInfos($Id, $mapName, $infokey = false)
+    public function getDirMap()
     {
-        $pool = $this->getMap($mapName);
-        if ($pool !== false && array_key_exists($Id, $pool)) {
-            if (empty($infokey)) {
-                return $pool[$Id];
-            }
-            if (array_key_exists($infokey, $pool[$Id])) {
-                return $pool[$Id][$infokey];
-            }
+        if ($this->init) {
+            return $this->dirMap;
         }
         return false;
-    }
-
-    public function getDistDirStruct()
-    {
-        return $this->dirStructure;
     }
 
     public function getDir($dirKey)
@@ -208,15 +138,84 @@ class MedicisMap implements MedicisMap_i
         return false;
     }
 
-    public function getAllIdsOfMap($mapName)
+    public function collcExists($collcId)
+    {
+        if ($this->init && \array_key_exists($collcId, $this->collcIndex)) {
+            return true;
+        }
+        return false;
+    }
+
+    public function groupExists($groupId)
+    {
+        if ($this->init && \array_key_exists($groupId, $this->collcMap)) {
+            return true;
+        }
+        return false;
+    }
+
+    public function getGroupInfos($groupId)
+    {
+        if ($this->groupExists($groupId)) {
+            return $this->collcMap[$groupId];
+        }
+        return false;
+    }
+
+    public function getGroupId($collcId)
+    {
+        if ($this->collcExists($collcId)) {
+            return $this->collcIndex[$collcId];
+        }
+        return false;
+    }
+
+    public function getCollcInfos($collcId)
+    {
+        $groupId = $this->getGroupId($collcId);
+        if ($groupId !== false) {
+            return $this->collcMap[$groupId]['collcs'][$collcId];
+        }
+        return false;
+    }
+
+    public function getCollcSrcPath($collcId)
+    {
+        $infos = $this->getCollcInfos($collcId);
+        if ($infos !== false) {
+            return $infos['srcPath'];
+        }
+        return false;
+    }
+
+    public function getCollcDistPath($collcId, $subDir)
+    {
+        $infos = $this->getCollcInfos($collcId);
+        if ($infos !== false && in_array($subDir, $this->dirStructure)) {
+            return $infos['distPaths'][$subDir];
+        }
+        return false;
+    }
+
+    public function getDistDirStruct()
+    {
+        return $this->dirStructure;
+    }
+
+    public function getAllGroupIds()
     {
         if ($this->init) {
-            $pool = $this->getMap($mapName);
-            if ($pool !== false) {
-                return array_keys($this->$pool);
-            }
-            return false;
+            return array_keys($this->collcMap);
         }
+        return false;
+    }
+
+    public function getAllCollcIds()
+    {
+        if ($this->init) {
+            return array_keys($this->collcIndex);
+        }
+        return false;
     }
 
 }
