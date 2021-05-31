@@ -3,61 +3,82 @@
 
 namespace SSITU\Medicis\MedicisFamily;
 
-class MedicisModels 
-{
+class MedicisModels implements MedicisModels_i {
     private $MedicisMap;
-    private $idlen = 21;
-    private $idpattern;
+    public $idpattern = '[\w\-]{21}';
 
-    public function __construct($MetaMedicis)
+    public function __construct($MetaMedicis, $idpattern = '')
     {
         $this->MedicisMap = $MetaMedicis->getMedicisMap();
-        $this->idpattern = '[\w\-]{' . $this->idlen . '}';
+        if(!empty($idpattern)){
+            $this->setIdPattern($pattern);
+        }
+        
     }
 
-    public function BaseArray($id, )
+    public function setIdPattern($pattern){     
+        if(Jack::Help()->isValidPattern($pattern)){
+            $this->idpattern = trim($pattern,'/');
+            return true;
+        }
+        return false;
+    }
+
+    private function prcTitle($id)
+    {
+        if (stripos($id, '/') !== false) {
+            $split = explode('/',$id);
+            $id = array_shift($split);
+
+            foreach($split as $part) {
+                    $id .= ucfirst($part);
+            }}
+        return $id;
+    }
+
+    public function BaseArray($id)
     {
         $prop = [];
         $prop['$id'] = "#/properties/" . $id;
-        $id = $id;
+        $prop['title'] = $this->prcTitle($id);
         $prop['type'] = 'array';
         $prop["uniqueItems"] = true;
         $prop["additionalItems"] = true;
         return $prop;
     }
 
-    public function EmailsArray($id, )
+    public function EmailsArray($id)
     {
         $prop = $this->BaseArray($id);
-        $prop["items"] = $this->Email($id . '/items', $id . 'Items');
+        $prop["items"] = $this->Email($id . '/items');
         return $prop;
     }
 
-    public function RefsArray($id, $refKey, )
+    public function RefsArray($id, $refKey)
     {
         $prop = $this->BaseArray($id);
-        $prop["items"] = $this->UniqueRef($id . '/items', $refKey, $id . 'Refs');
+        $prop["items"] = $this->UniqueRef($id . '/items', $refKey);
         return $prop;
     }
 
-    public function BoolsArray($id, $default = null, )
+    public function BoolsArray($id, $default = null)
     {
         $prop = $this->BaseArray($id);
-        $prop["items"] = $this->Bool($id . '/items', $default, $id . 'Items');
+        $prop["items"] = $this->Bool($id . '/items', $default);
         return $prop;
     }
 
     public function StringsArray($id, $itExample, $itMin = false, $itMax = false, $itPattern = false)
     {
         $prop = $this->BaseArray($id);
-        $prop["items"] = $this->String($id . '/items', $itExample, $id . 'Items', $itMin, $itMax, $itPattern);
+        $prop["items"] = $this->String($id . '/items', $itExample, $itMin, $itMax, $itPattern);
         return $prop;
     }
 
     public function NumbersArray($id, $itMin = false, $itMax = false)
     {
         $prop = $this->BaseArray($id);
-        $prop["items"] = $this->Number($id . '/items', $id . 'Items', $itMin, $itMax);
+        $prop["items"] = $this->Number($id . '/items', $itMin, $itMax);
         return $prop;
     }
 
@@ -69,11 +90,11 @@ class MedicisModels
         return $prop;
     }
 
-    public function Bool($id, $default = null, )
+    public function Bool($id, $default = null)
     {
         $prop = [];
         $prop['$id'] = "#/properties/" . $id;
-        $id = $this->processTitle($id);
+        $prop['title'] = $this->prcTitle($id);
         $prop['type'] = 'boolean';
         $prop["example"] = false;
         if ($default !== null) {
@@ -84,7 +105,7 @@ class MedicisModels
         return $prop;
     }
 
-    public function Email($id, )
+    public function Email($id)
     {
         $example = 'some.name@domain.xyz';
         $prop = $this->String($id, $example);
@@ -96,7 +117,7 @@ class MedicisModels
     {
         $prop = [];
         $prop['$id'] = "#/properties/" . $id;
-        $id = $this->processTitle($id);
+        $prop['title'] = $this->prcTitle($id);
         $prop['type'] = 'string';
 
         $prop['example'] = $example;
@@ -112,18 +133,19 @@ class MedicisModels
         return $prop;
     }
 
-    public function Path($id = "path"){
+    public function Path($id = "path")
+    {
         $example = 'path/to/file.ext';
         $prop = $this->String($id, $example);
         $prop["format"] = "uri-reference";
-        return $prop;      
+        return $prop;
     }
 
     public function Number($id, $min = false, $max = false)
     {
         $prop = [];
         $prop['$id'] = "#/properties/" . $id;
-        $id = $this->processTitle($id);
+        $prop['title'] = $this->prcTitle($id);;
         $prop['type'] = 'number';
 
         if (!empty($min)) {
@@ -161,9 +183,9 @@ class MedicisModels
         return $this->String($id, $example, $minLen, $maxLen);
     }
 
-    public function UniqueRef($id, $refKey, )
+    public function UniqueRef($id, $refKey)
     {
-        $refExists = $this->MedicisMap->IdExists($refKey, 'collc');
+        $refExists = $this->MedicisMap->collcExists($refKey);
         if ($refExists === false) {
             return ['err' => 'reference key not found: ' . $refKey];
         }
@@ -171,18 +193,18 @@ class MedicisModels
         $escFilename = str_replace('-', '\-', $refKey);
         $prop = [];
         $prop['$id'] = "#/properties/" . $id;
-        $id = $this->processTitle($id);
+        $prop['title'] = $this->prcTitle($id);;
         $prop["type"] = 'object';
         $prop["additionalProperties"] = false;
 
         $pointerId = 'relPointer';
-        $pointerExample = $foreignFileName . '.json#/f4_r5e5-HRz5f8-tZ45fR';
+        $pointerExample = $foreignFileName . '.json#/123e4567-e89b-12d3-a456-426614174000';
         $pointerPattern = '^' . $escFilename . '\.json#/' . $this->idpattern . '\$';
-        $prop["properties"][$pointerId] = $this->String($id . '/properties/' . $pointerId, $pointerExample, ucfirst($pointerId), false, false, $pointerPattern);
+        $prop["properties"][$pointerId] = $this->String($id . '/'.$pointerId, $pointerExample, false, false, $pointerPattern);
 
         $labelId = 'relLabel';
         $labelExample = 'Related Item Label';
-        $prop["properties"][$labelId] = $this->String($id . '/properties/' . $labelId, $labelExample, ucfirst($labelId));
+        $prop["properties"][$labelId] = $this->String($id . '/' . $labelId, $labelExample);
 
         return $prop;
     }

@@ -1,17 +1,11 @@
 {
-  "collc": {
-    "name": {
-      "c-pplcs": "People and Places",
-      "main": "Main"
-    },
-    "prop": {
-      "label": "Label",
-      "name": "Name",
-      "activities": "Activities",
-      "activity": "Activity",
-      "emails": "Emails",
-      "addresses": "Addresses",
-      "websites": "Websites"
-    }
-  }
+      "collc.name.c-pplcs": "People and Places",
+      "collc.name.main": "Main",
+      "collc.prop.label": "Label",
+      "collc.prop.name": "Name",
+      "collc.prop.activities": "Activities",
+      "collc.prop.activity": "Activity",
+      "collc.prop.emails": "Emails",
+      "collc.prop.addresses": "Addresses",
+      "collc.prop.websites": "Websites"
 }

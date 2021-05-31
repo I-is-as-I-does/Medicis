@@ -5,15 +5,13 @@ namespace SSITU\Medicis;
 
 use SSITU\JackTrades\Jack;
 
-class MetaMedicis implements MetaMedicis_i
-{
+class MetaMedicis implements MetaMedicis_i {
     private $MedicisMap;
 
     private $MedicisSchema;
     private $MedicisGroup;
     private $MedicisTransl;
     private $MedicisCollc;
-    private $MedicisProfile;
     private $MedicisModels;
 
     public function __construct($MedicisMap)
@@ -43,56 +41,54 @@ class MetaMedicis implements MetaMedicis_i
         return false;
     }
 
-    public function getBundleInfos($GroupOrProflId, $mapName)
-    {
-        $infos = $this->MedicisMap->getInfos($GroupOrProflId, $mapName);
-        if ($infos === false || empty($infos['name'])) {
-            return ['err' => 'unvalid ' . $mapName . ' Id: ' . $GroupOrProflId];
+    public function quickCheckSchema($collcId,$sch = []){
+        if(empty($sch)){
+            $sch = $this->getCollcFile($collcId, 'sch');
         }
-        return $infos;
-    }
-
-    public function getSchema($SchPathOrId)
-    {
-        if (is_array($SchPathOrId) && array_key_exists('$id', $SchPathOrId)) {
-            return $SchPathOrId;
-        }
-        if (is_string($SchPathOrId)) {
-            $path = $SchPathOrId;
-            if (!is_file($SchPathOrId)) {
-                $path = $this->distDirs['sch'] . $SchPathOrId . '.json';
-            }
-            $sch = Jack::File()->readJson($path);
-        }
-
-        if (empty($sch)) {
-            return ['err' => 'Unvalid schema or path: ' . var_export($SchPathOrId, true)];
+        if(!array_key_exists('properties',$sch)){
+            $sch = ['err' => 'Unvalid schema; collc Id: "'.$collcId.'"'];
         }
         return $sch;
     }
 
-    public function getPartialsDistPath($Id, $suffx)
+
+    public function quickCheckSrc($collcId,$src = [])
     {
-        return $this->MedicisMap->getDir('dist/partials/' . $suffx) . $Id . '-' . $suffx . '.json';
+        if(empty($src)){
+            $src = $this->getCollcFile($collcId, 'src');
+        }
+        if(!array_key_exists('props',$src)){
+            $sch = ['err' => 'Unvalid source; collc Id: "'.$collcId.'"'];
+        }
+        return $src;
     }
 
-    public function saveDistFile($content, $Id, $suffx, $proflFilename = false)
+    public function getCollcFile($PathOrId, $dirKey = ''){
+        if (substr($PathOrId,-5) == '.json'){
+                $path = $PathOrId;
+            } elseif($dirKey == 'src'){
+                    $path = $this->MedicisMap->getCollcSrcPath($PathOrId);
+                } elseif(!empty($dirKey)) {
+                    $path = $this->MedicisMap->getCollcDistPath($PathOrId, $dirKey);
+                }
+            if (!empty($path) && is_file($path)) {
+                $content = Jack::File()->readJson($path);
+                if (!empty($content)) {
+                    return $content;
+                }
+            }
+         return ['err' => 'Unvalid content, path or id: ' . $PathOrId];
+    }
+
+    public function saveDistFile($content, $collcId, $subDir)
     {
-        if ($proflFilename === false) {
-            $path = $this->getPartialsDistPath($Id, $suffx);
-        } else {
-            $path = $this->getProfileDistPath($Id, $suffx, $proflFilename);
+        $path = $this->MedicisMap->getCollcDistPath($collcId, $subDir);
+        if ($path === false) {
+            return ['err'=>'Unvalid collection Id "'.$collcId.'" or sub directory "'.$subDir.'"'];
         }
         return Jack::File()->saveJson($content, $path, true);
     }
 
-    public function getProfileDistPath($Id, $suffx, $proflFilename)
-    {
-        $base = $this->MedicisMap->getDir('dist/profiles') . $Id . '/' . $suffx . '/';
-        if (!is_dir($base)) {
-            mkdir($base, 0777, true);
-        }
-        return $base . $proflFilename . '.json';
-    }
+
 
 }

@@ -5,30 +5,24 @@ namespace SSITU\Medicis\MedicisFamily;
 
 use SSITU\JackTrades\Jack;
 
-class MedicisSchema implements MedicisSchema_i
-{
+class MedicisSchema implements MedicisSchema_i {
 
     private $MetaMedicis;
     private $MedicisModels;
-    private $MedicisMap;
 
     public function __construct($MetaMedicis)
     {
         $this->MetaMedicis = $MetaMedicis;
-        $this->MedicisMap = $MetaMedicis->getMedicisMap();
         $this->MedicisModels = $MetaMedicis->getMedicisMember('Models');
     }
 
-    public function schBuild($collcId)
+    public function schBuild($collcId, $src = [])
     {
-        $collcInfos = $this->MedicisMap->getInfos($collcId, 'collc');
-        if ($collcInfos === false) {
-            return ['err' => 'Unknown collection Id ' . $collcId];
+        $src = $this->MetaMedicis->quickCheckSrc($collcId,$src);
+        if(array_key_exists('err',$src)){
+            return $src;
         }
-        $src = Jack::File()->readJson($collcInfos['path']);
-        if (empty($src)) {
-            return ['err' => 'Read error: ' . $collcInfos['path']];
-        }
+
         $props = $this->prcPropreties($src);
         if (array_key_exists('err', $props)) {
             return $props;
@@ -42,21 +36,16 @@ class MedicisSchema implements MedicisSchema_i
         if ($check !== true) {
             return $check;
         }
-        $collcTitle = $collcInfos['groupName'] . ' | ' . $src['name'];
-        $schema = $this->schWrap($collcId, $collcTitle, $required, $props);
-        $save = $this->MetaMedicis->saveDistFile($schema, $collcId, 'sch');
-        if (array_key_exists('err', $save)) {
-            return $save;
-        }
-        return ['rslt' => $save, 'sch' => $schema, 'groupId' => $collcInfos['groupId'], 'priority' => $src['priority']];
+      
+        return $this->schWrap($collcId, $required, $props);
     }
 
-    private function schWrap($collcId, $collcTitle, $required, $props)
+    private function schWrap($collcId, $required, $props)
     {
         return [
             '$schema' => "http://json-schema.org/draft-07/schema",
             '$id' => $collcId . '.json',
-            'title' => $collcTitle,
+            'title' => $collcId,
             "type" => "object",
             "required" => $required,
             "properties" => $props,
@@ -72,15 +61,19 @@ class MedicisSchema implements MedicisSchema_i
 
         $props = [];
         foreach ($src['props'] as $k => $info) {
-            if (empty($info['param'])) {
-                return ['err' => 'No specified param; must at least contain property id; param key: ' . $k];
-            }
-            $param = $info['param'];
-            $id = $param[0];
+           
             if (empty($info['method'])) {
-                return ['err' => 'A MedicisModels method has not been specified for prop "' . $id . '"'];
+                return ['err' => 'A MedicisModels method has not been specified for prop n."' . $k+1 . '"'];
             }
             $method = $info['method'];
+            
+            if (empty($info['param'])) {
+                $info['param'] = [lcfirst($method)];
+            }
+            
+            $param = $info['param'];
+            $id = $param[0];
+            
             if (!method_exists($this->MedicisModels, $method)) {
                 return ['err' => 'method "' . $method . '" does not exist in MedicisModels'];
             }
