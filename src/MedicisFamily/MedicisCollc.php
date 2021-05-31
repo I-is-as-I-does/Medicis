@@ -27,7 +27,7 @@ class MedicisCollc implements MedicisCollc_i
         $rslt['sch'] = $this->MetaMedicis->saveDistFile($sch, $collcId, 'sch');
         if (!array_key_exists('err', $rslt['sch'])) {
             $rslt['data'] = $this->dummyDataBuild($collcId, $sch);
-            $rslt['config'] = $this->buildCollcConfig($collcId, $src);
+            $rslt['config'] = $this->collcConfigBuild($collcId, $src);
             if ($translToo === true) {
                 $rslt['transl'] = $this->MetaMedicis->getMedicisMember('Transl')->collcTranslBuild($collcId, $sch);
             }
@@ -35,7 +35,7 @@ class MedicisCollc implements MedicisCollc_i
         return $rslt;
     }
 
-    public function buildCollcConfig($collcId, $src = [])
+    public function collcConfigBuild($collcId, $src = [])
     {
 
         $src = $this->MetaMedicis->quickCheckSrc($collcId, $src);

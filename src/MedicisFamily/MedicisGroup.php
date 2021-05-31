@@ -9,11 +9,12 @@ class MedicisGroup implements MedicisGroup_i
 {
     private $MetaMedicis;
     private $MedicisMap;
-
+    private $dirStruc;
     public function __construct($MetaMedicis)
     {
         $this->MetaMedicis = $MetaMedicis;
         $this->MedicisMap = $MetaMedicis->getMedicisMap();
+        $this->dirStruc = $this->MedicisMap->getDistDirStruct();
     }
 
     public function groupBuild($groupId, $translToo = true)
@@ -24,19 +25,31 @@ class MedicisGroup implements MedicisGroup_i
         }
         $groupCollcs = $groupInfos['collcs'];
         $rslt = [];
-        $configBundle = [];
+        $bundle = [];
         foreach ($groupCollcs as $collcId => $collcPaths) {
             $collcBuild = $this->MetaMedicis->getMedicisMember('Collc')->collcBuild($collcId, $translToo);
             $rslt['collcs-build'][$collcId] = $collcBuild;
-            if (!array_key_exists('err', $collcBuild) && array_key_exists('success', $collcBuild['config'])) {
-                $configBundle[$collcId] = $this->MetaMedicis->getCollcFile($collcPaths['distPaths']['config']);
+            if (!array_key_exists('err', $collcBuild)) {
+                foreach ($this->dirStruc as $subDir) {
+                    $rslt[$subDir . '-bundle'] = [];
+                    if (array_key_exists('success', $collcBuild[$subDir]) && ($translToo || $subDir !== 'transl')) {
+                        $content = $this->MetaMedicis->getCollcFile($collcPaths['distPaths'][$subDir]);
+                        if (!array_key_exists('err', $content)) {
+                            $bundle[$subDir][$collcId] = $content;
+                        } else {
+                            $rslt[$subDir . '-bundle']['err'][$collcId] = $content;
+                        }
+                    }
+                }
             }
         }
-        if (!empty($configBundle)) {
-            $bundlepath = $groupInfos['distDirPaths']['config'] . $groupId . '.json';
-            $rslt['config-bundle'] = Jack::File()->saveJson($configBundle, $bundlepath, true);
-        } else {
-            $rslt['config-bundle'] = 'skipped: no config file found';
+        if (!empty($bundle)) {
+            foreach ($bundle as $subDir => $collcData) {
+                if (!array_key_exists('err', $rslt[$subDir . '-bundle'])) {
+                    $bundlepath = $groupInfos['distDirPaths'][$subDir] . $groupId . '.json';
+                    $rslt[$subDir . '-bundle'] = Jack::File()->saveJson($collcData, $bundlepath, true);
+                }
+            }
         }
 
         if ($translToo === true) {
