@@ -102,7 +102,7 @@ class MedicisCli
             if ($this->currentMenu == 1) {
                 $method = 'collcTranslBuild';
             } else {
-                $method = 'groupTranslCheck';
+                $method = 'groupTranslBuild';
             }
         } else {
             $member = $this->mainMenu[$this->currentMenu];

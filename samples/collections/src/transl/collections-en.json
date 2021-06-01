@@ -1,20 +1,20 @@
 {
   "name": {
-    "c-media": "",
-    "c-media-files": "",
+    "c-media": "Media",
+    "c-media-files": "Media Files",
     "c-pplcs": "People and Places",
-    "c-pplcs-activities": "",
-    "c-pplcs-contacts": ""
+    "c-pplcs-activities": "People and Places | Activities",
+    "c-pplcs-contacts": "People and Places | Contacts"
   },
   "prop": {
     "activities": "Activities",
     "activity": "Activity",
     "addresses": "Addresses",
-    "credits": "",
+    "credits": "Credits",
     "emails": "Emails",
     "label": "Label",
     "name": "Name",
-    "path": "",
+    "path": "Path",
     "websites": "Websites"
   }
 }

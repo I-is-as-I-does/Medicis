@@ -1,21 +1,21 @@
 {
-  "name": {
-    "c-media": "",
-    "c-media-files": "",
-    "c-pplcs": "Personnes et Lieux",
-    "c-pplcs-activities": "",
-    "c-pplcs-contacts": "",
-    "main": "Principal"
-  },
-  "prop": {
-    "activities": "Activit\u00e9s",
-    "activity": "Activit\u00e9",
-    "addresses": "Adresses",
-    "credits": "",
-    "emails": "Emails",
-    "label": "\u00c9tiquette",
-    "name": "Nom",
-    "path": "",
-    "websites": "Sites Web"
-  }
+    "name": {
+        "c-media": "Media",
+        "c-media-files": "Fichiers Media",
+        "c-pplcs": "Personnes et Lieux",
+        "c-pplcs-activities": "Personnes et Lieux | Activit\u00e9s",
+        "c-pplcs-contacts": "Personnes et Lieux | Contacts",
+        "main": "Principal"
+    },
+    "prop": {
+        "activities": "Activit\u00e9s",
+        "activity": "Activit\u00e9",
+        "addresses": "Adresses",
+        "credits": "Credits",
+        "emails": "Emails",
+        "label": "\u00c9tiquette",
+        "name": "Nom",
+        "path": "Chemin",
+        "websites": ""
+    }
 }

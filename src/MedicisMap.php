@@ -13,6 +13,8 @@ class MedicisMap implements MedicisMap_i
     private $dirMap = [];
     private $collcIndex = [];
     private $collcMap = [];
+    private $translMap = [];
+    private $langs = [];
 
     private $log = [];
 
@@ -26,7 +28,7 @@ class MedicisMap implements MedicisMap_i
         }
         $this->collectionDirPath = trim($collectionDirPath, '/\\') . '/';
 
-        foreach (['buildDirMap', 'buildCollcMap'] as $initMethod) {
+        foreach (['buildDirMap', 'buildTranslMap', 'buildCollcMap'] as $initMethod) {
             $do = $this->$initMethod();
 
             if ($do !== true) {
@@ -43,28 +45,50 @@ class MedicisMap implements MedicisMap_i
         $groupPaths = glob($this->dirMap['src/collc'] . '*/', GLOB_ONLYDIR);
         foreach ($groupPaths as $groupPath) {
             $groupId = basename($groupPath);
-            $srcPaths = glob($groupPath . $groupId.'-*.json');
+            $srcPaths = glob($groupPath . $groupId . '-*.json');
             $distDirPaths = $this->groupDistPaths($groupId);
-            $this->collcMap[$groupId]['groupSrcConfig'] = $groupPath.$groupId.'.json';
+            $this->collcMap[$groupId]['groupSrcConfig'] = $groupPath . $groupId . '.json';
             $this->collcMap[$groupId]['distDirPaths'] = $distDirPaths;
-            $this->collcMap[$groupId]['bundlePaths'] = $this->bundleDistPaths($groupId);
+            $this->collcMap[$groupId]['groupDistPaths'] = $this->bundleDistPaths($groupId);
 
             foreach ($srcPaths as $srcPath) {
                 $collcId = basename($srcPath, '.json');
                 $this->collcIndex[$collcId] = $groupId;
 
                 $this->collcMap[$groupId]['collcs'][$collcId]['srcPath'] = $srcPath;
-                $this->collcMap[$groupId]['collcs'][$collcId]['distPaths'] = $this->collcDistPaths($distDirPaths, $collcId);
+                $this->collcMap[$groupId]['collcs'][$collcId]['collcDistPaths'] = $this->collcDistPaths($distDirPaths, $collcId);
             }
         }
         return true;
+    }
+
+    private function buildTranslMap()
+    {
+        $files = glob($this->dirMap['src/transl'] . 'collections-*.json');
+        if (empty($files)) {
+            $this->log["anomaly"][] = "No translation files found";
+            return true;
+        }
+        foreach ($files as $path) {
+            $lang = $this->extractLang($path);
+            $this->translMap[$lang] = $path;
+        }
+        $this->langs = array_keys($this->translMap);
+        return true;
+    }
+
+    private function extractLang($path)
+    {
+        $parts = explode('-', basename($path, '.json'));
+        return array_pop($parts);
     }
 
     private function collcDistPaths($distDirPaths, $collcId)
     {
         $collcDistPaths = [];
         foreach ($distDirPaths as $subDir => $distPath) {
-            $collcDistPaths[$subDir] = $distPath . $collcId . '-' . $subDir . '.json';
+            $basePath = $distPath . $collcId . '-' . $subDir;
+            $collcDistPaths[$subDir] = $this->buildDistPath($basePath, $subDir)[$subDir];
         }
         return $collcDistPaths;
     }
@@ -78,10 +102,23 @@ class MedicisMap implements MedicisMap_i
             $this->log['done'][] = 'created dir. dist/' . $groupId . '/bundle';
         }
         foreach ($this->dirStructure as $subDir) {
-            $bundlePaths[$subDir] = $bundleDirPath . '/'.$groupId.'-'.$subDir . '.json';
-            
+            $basePath = $bundleDirPath . '/' . $groupId . '-' . $subDir;
+            $bundlePaths[$subDir] = $this->buildDistPath($basePath, $subDir)[$subDir];
         }
         return $bundlePaths;
+    }
+
+    private function buildDistPath($basePath, $subDir)
+    {
+        $stock = [];
+        if ($subDir == 'transl') {
+            foreach ($this->langs as $lang) {
+                $stock[$subDir][$lang] = $basePath . '-' . $lang . '.json';
+            }
+        } else {
+            $stock[$subDir] = $basePath . '.json';
+        }
+        return $stock;
     }
 
     private function groupDistPaths($groupId)
@@ -132,10 +169,27 @@ class MedicisMap implements MedicisMap_i
         return false;
     }
 
-    public function getCollcIndex()
-    {if ($this->init) {
-        return $this->collcIndex;
+    public function getTranslMap()
+    {
+        if ($this->init) {
+            return $this->translMap;
+        }
+        return false;
     }
+
+    public function getAvailableLangs()
+    {
+        if ($this->init) {
+            return $this->langs;
+        }
+        return false;
+    }
+
+    public function getCollcIndex()
+    {
+        if ($this->init) {
+            return $this->collcIndex;
+        }
         return false;
     }
 
@@ -205,11 +259,22 @@ class MedicisMap implements MedicisMap_i
         return false;
     }
 
-    public function getCollcDistPath($collcId, $subDir)
+    public function getDistPath($Id, $subDir, $group = false, $lang = false)
     {
-        $infos = $this->getCollcInfos($collcId);
+        $hook = 'collc';
+        if ($group === true) {
+            $hook = 'group';
+        }
+        $method = 'get' . ucfirst($hook) . 'Infos';
+        $infosK = $hook . 'DistPaths';
+        $infos = $this->$method($Id);
         if ($infos !== false && in_array($subDir, $this->dirStructure)) {
-            return $infos['distPaths'][$subDir];
+            if ($subDir !== 'transl') {
+                return $infos[$infosK][$subDir];
+            }
+            if (!empty($lang) && in_array($lang, $this->langs)) {
+                return $infos[$infosK][$subDir][$lang];
+            }
         }
         return false;
     }

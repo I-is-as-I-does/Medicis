@@ -1,0 +1,10 @@
+{
+    "prop": {
+        "label": "Label",
+        "path": "Path",
+        "credits": "Credits"
+    },
+    "name": {
+        "c-media-files": "Media Files"
+    }
+}

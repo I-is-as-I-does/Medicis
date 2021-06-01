@@ -3,8 +3,6 @@
 
 namespace SSITU\Medicis\MedicisFamily;
 
-use SSITU\Jack\Jack;
-
 class MedicisGroup implements MedicisGroup_i
 {
     private $MetaMedicis;
@@ -24,42 +22,118 @@ class MedicisGroup implements MedicisGroup_i
             return $groupInfos;
         }
         $groupCollcs = $groupInfos['collcs'];
-        $rslt = [];
+        $errlog = [];
+
         $bundle = [];
-        $transl = [];
         foreach ($groupCollcs as $collcId => $collcPaths) {
+
             $collcBuild = $this->MetaMedicis->getMedicisMember('Collc')->collcBuild($collcId, $translToo);
-            $rslt['collcs-build'][$collcId] = $collcBuild;
-            if (!array_key_exists('err', $collcBuild)) {
-                foreach ($this->dirStruc as $subDir) {
-                    $rslt[$subDir . '-bundle'] = [];
-                    if (array_key_exists('success', $collcBuild[$subDir]) && ($translToo || $subDir !== 'transl')) {
-                        $content = $this->MetaMedicis->getCollcFile($collcPaths['distPaths'][$subDir]);
-                        if (!array_key_exists('err', $content)) {
-                            $bundle[$subDir][$collcId] = $content;
-                        } else {
-                            $rslt[$subDir . '-bundle']['err'][$collcId] = $content['err'];
+            if (array_key_exists('err', $collcBuild)) {
+                $errlog[$collcId]['err'] = $collcBuild['err'];
+                $bundle = [];
+                break;
+            }
+            foreach ($collcBuild as $subDir => $buildRslt) {
+                if (array_key_exists($subDir . '-bundle', $errlog)) {
+                    continue;
+                }
+                if (!array_key_exists('err', $buildRslt) && !array_key_exists('todo', $buildRslt)) {
+                    $prc = $this->bundleContent($collcId, $subDir, $collcPaths['collcDistPaths']);
+                    if (!array_key_exists('err', $prc)) {
+                        $bundle[$subDir] = $prc;
+                        continue;
+                    } else {
+                        $errlog[$subDir . '-bundle']['err'] = $prc['err'];
+                    }
+                } else {
+                    foreach (['err', 'todo'] as $badK) {
+                        if (!empty($buildRslt[$badK])) {
+                            $errlog[$subDir . '-bundle'][$badK] = $buildRslt[$badK];
                         }
                     }
                 }
+                $bundle[$subDir] = [];
             }
-        }
-        if (!empty($bundle)) {
-            if (!empty($bundle['config']) && file_exists($groupInfos['groupSrcConfig'])) {
-                $wrapConfig = $this->groupConfig($bundle['config'], $groupInfos['groupSrcConfig']);
-                if (array_key_exists('err', $wrapConfig)) {
-                    $rslt['config-bundle']['err']['group-config'] = $wrapConfig['err'];
-                } else {
-                    $bundle['config'] = $wrapConfig;
-                }
-            }
-            $rslt = $this->createBundleFiles($groupId, $bundle, $groupInfos['bundlePaths'], $rslt);
+
         }
 
-        if ($translToo === true) {
-            $rslt['transl'] = $this->MetaMedicis->getMedicisMember('Transl')->groupTranslCheck($groupId);
+        if (!empty($bundle)) {
+            $jobs = ['config' => $groupInfos['groupSrcConfig'],
+                'transl' => $groupId];
+            foreach ($jobs as $jobK => $scdParam) {
+                if (!empty($bundle[$jobK])) {
+                    $method = 'prcBundle' . ucfirst($jobK);
+                    $bundle[$jobK] = $this->$method($bundle[$jobK], $scdParam);
+                    if (array_key_exists('err', $bundle[$jobK])) {
+                        $errlog[$jobK . '-bundle']['err'] = $bundle[$jobK]['err'];
+                        unset($bundle[$jobK]);
+                    }
+                }
+            }
+            $bundleRslt = $this->createBundleFiles($groupId, $bundle);
         }
-        return $rslt;
+
+        return $this->mergeRslt($bundleRslt, $errlog);
+    }
+
+    private function mergeRslt($bundleRslt, $errlog)
+    {
+        if (!empty($errlog)) {
+            foreach ($errlog as $bundleK => $errdata) {
+                $errk = array_key_first($errdata);
+                $errc = $errdata[$errk];
+                if (is_array($errc)) {
+                    $errc = implode(PHP_EOL, $errc);
+                }
+                $bundleRslt[$bundleK][$errk] = $errc;
+            }
+        }
+        return $bundleRslt;
+    }
+    private function prcBundleTransl($bundleTransl, $groupId)
+    {
+        $groupNameTransl = $this->MetaMedicis->getMedicisMember('Transl')->groupTranslBuild($groupId);
+        if (array_key_exists('err', $groupNameTransl)) {
+            return ['err' => implode(PHP_EOL,$groupNameTransl['err'])];
+        }
+        if (array_key_exists('todo', $groupNameTransl)) {
+            return ['err' => implode(PHP_EOL,$groupNameTransl['todo'])];
+        }
+      
+        foreach ($groupNameTransl['success'] as $lang => $data) {
+            
+            $bundleTransl[$lang][$groupId] = $data['name'][$groupId];
+        }
+
+        return $bundleTransl;
+    }
+
+    private function prcBundleConfig($bundleConfig, $groupSrcConfig)
+    {
+        if (file_exists($groupSrcConfig)) {
+            return $this->groupConfig($bundleConfig, $groupSrcConfig);
+        }
+        return $bundleConfig;
+    }
+
+    private function bundleContent($collcId, $subDir, $collcDistPaths)
+    {
+        if ($subDir !== 'transl') {
+            $content = $this->MetaMedicis->getCollcFile($collcDistPaths[$subDir]);
+            if (array_key_exists('err', $content)) {
+                return $content;
+            }
+            return [$collcId => $content];
+        }
+        $stock = [];
+        foreach ($collcDistPaths[$subDir] as $lang => $translPath) {
+            $content = $this->MetaMedicis->getCollcFile($translPath);
+            if (array_key_exists('err', $content)) {
+                return $content;
+            }
+            $stock[$lang][$collcId] = $content;
+        }
+        return $stock;
     }
 
     private function groupConfig($bundleConfig, $groupConfigPath)
@@ -71,14 +145,21 @@ class MedicisGroup implements MedicisGroup_i
             return $groupConfig['config'];
         }
 
-    return $groupConfig;
+        return $groupConfig;
     }
 
-    private function createBundleFiles($groupId, $bundle, $bundlePaths, $rslt)
+    private function createBundleFiles($groupId, $bundle)
     {
+        $rslt = [];
         foreach ($bundle as $subDir => $collcData) {
-            if (!array_key_exists('err', $rslt[$subDir . '-bundle'])) {
-                $rslt[$subDir . '-bundle'] = Jack::File()->saveJson($collcData, $bundlePaths[$subDir], true);
+            if (!empty($collcData)) {
+                if ($subDir == 'transl') {
+                    foreach ($collcData as $lang => $data) {
+                        $rslt['transl-bundle-' . $lang] = $this->MetaMedicis->saveDistFile($data, $groupId, $subDir, true, $lang);
+                    }
+                } else {
+                    $rslt[$subDir . '-bundle'] = $this->MetaMedicis->saveDistFile($collcData, $groupId, $subDir, true);
+                }
             }
         }
         return $rslt;
