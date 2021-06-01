@@ -47,6 +47,7 @@ class MedicisMap implements MedicisMap_i
             $distDirPaths = $this->groupDistPaths($groupId);
             $this->collcMap[$groupId]['groupSrcConfig'] = $groupPath.$groupId.'.json';
             $this->collcMap[$groupId]['distDirPaths'] = $distDirPaths;
+            $this->collcMap[$groupId]['bundlePaths'] = $this->bundleDistPaths($groupId);
 
             foreach ($srcPaths as $srcPath) {
                 $collcId = basename($srcPath, '.json');
@@ -66,6 +67,21 @@ class MedicisMap implements MedicisMap_i
             $collcDistPaths[$subDir] = $distPath . $collcId . '-' . $subDir . '.json';
         }
         return $collcDistPaths;
+    }
+
+    private function bundleDistPaths($groupId)
+    {
+        $bundlePaths = [];
+        $bundleDirPath = $this->dirMap['dist'] . $groupId . '/bundle';
+        if (!is_dir($bundleDirPath)) {
+            mkdir($bundleDirPath, 0777, true);
+            $this->log['done'][] = 'created dir. dist/' . $groupId . '/bundle';
+        }
+        foreach ($this->dirStructure as $subDir) {
+            $bundlePaths[$subDir] = $bundleDirPath . '/'.$groupId.'-'.$subDir . '.json';
+            
+        }
+        return $bundlePaths;
     }
 
     private function groupDistPaths($groupId)
