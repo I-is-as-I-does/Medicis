@@ -53,7 +53,7 @@ class MedicisGroup implements MedicisGroup_i
                     $bundle['config'] = $wrapConfig;
                 }
             }
-            $rslt = $this->createBundleFiles($groupId, $bundle, $groupInfos['distDirPaths'], $rslt);
+            $rslt = $this->createBundleFiles($groupId, $bundle, $groupInfos['bundlePaths'], $rslt);
         }
 
         if ($translToo === true) {
@@ -74,12 +74,11 @@ class MedicisGroup implements MedicisGroup_i
     return $groupConfig;
     }
 
-    private function createBundleFiles($groupId, $bundle, $distDirPaths, $rslt)
+    private function createBundleFiles($groupId, $bundle, $bundlePaths, $rslt)
     {
         foreach ($bundle as $subDir => $collcData) {
             if (!array_key_exists('err', $rslt[$subDir . '-bundle'])) {
-                $bundlepath = $distDirPaths[$subDir] . $groupId . '.json';
-                $rslt[$subDir . '-bundle'] = Jack::File()->saveJson($collcData, $bundlepath, true);
+                $rslt[$subDir . '-bundle'] = Jack::File()->saveJson($collcData, $bundlePaths[$subDir], true);
             }
         }
         return $rslt;

@@ -184,7 +184,7 @@ You'll get a log of what worked, failed, have been skipped, etc, and you'll find
 In CLI, a `'Group'` command will:
 
 - run action for **all group collections** at once,
-- plus generate a bundled file for each category.
+- plus generate a bundled file for each category. Destination folder: `dist/your-group/bundle/`.
 
 ## MetaMedicis
 
