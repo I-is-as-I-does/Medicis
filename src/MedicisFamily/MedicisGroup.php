@@ -45,11 +45,12 @@ class MedicisGroup implements MedicisGroup_i
             }
         }
         if (!empty($bundle)) {
-            if (!empty($bundle['config'])) {
-                $bundle['config'] = $this->groupConfig($bundle['config'], $groupInfos['groupSrcConfig']);
-                if (array_key_exists('err', $bundle['config'])) {
-                    $rslt['config-bundle']['err']['group-config'] = $bundle['config']['err'];
-                    unset($bundle['config']);
+            if (!empty($bundle['config']) && file_exists($groupInfos['groupSrcConfig'])) {
+                $wrapConfig = $this->groupConfig($bundle['config'], $groupInfos['groupSrcConfig']);
+                if (array_key_exists('err', $wrapConfig)) {
+                    $rslt['config-bundle']['err']['group-config'] = $wrapConfig['err'];
+                } else {
+                    $bundle['config'] = $wrapConfig;
                 }
             }
             $rslt = $this->createBundleFiles($groupId, $bundle, $groupInfos['distDirPaths'], $rslt);
@@ -63,13 +64,14 @@ class MedicisGroup implements MedicisGroup_i
 
     private function groupConfig($bundleConfig, $groupConfigPath)
     {
+
         $groupConfig = $this->MetaMedicis->getCollcFile($groupConfigPath);
         if (!array_key_exists('err', $groupConfig)) {
             $groupConfig['config']["items"] = $bundleConfig;
             return $groupConfig['config'];
         }
-        return $groupConfig;
 
+    return $groupConfig;
     }
 
     private function createBundleFiles($groupId, $bundle, $distDirPaths, $rslt)

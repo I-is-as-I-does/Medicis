@@ -134,6 +134,8 @@ If collections are going to be integrated in some UI, it could be things like au
 
 Content will be detached from the src file, into its own file in `dist/`. As for the other collection files, a bundle is generated when running `'Groups'` commands in CLI.
 
+You can also create a similar file for group-wide config, in `src/collc/your-group/`, naming it after your group: `your-group.json`. The group bundle file will then include the group config, and wrap collections config in an 'items' property.
+
 ### Translation
 
 For each language your are planning translations, create a file in `src/transl` folder, named as follow: `collections-{language}.json`
@@ -142,24 +144,28 @@ In CLI, run `'transl'` commands for either collections, or groups: source transl
 
 Note that `'all'` commands include translation.
 
-Entries are prefixed with `'collc'`;
+Entries are separated between:
 
-- then `'name'` for collections and groups names,
-- or `'prop'` for properties titles.
+- `'name'` for collections and groups names,
+- and `'prop'` for properties titles.
 
 _Example_
 `collections-en.json`
 
 ```JSON
 {
-    "collc.name.people": "People",
-    "collc.name.people-activities": "People | Activities",
-    "collc.name.people-contacts": "People | Contact",
-    "collc.prop.name": "Name",
-    "collc.prop.addresses": "Addresses",
-    "collc.prop.emails": "Emails",
-    "collc.prop.websites": "Websites"
-    "collc.prop.activity": "Activity"
+  "name":{
+    "people": "People",
+    "people-activities": "People | Activities",
+    "people-contacts": "People | Contact"
+    },
+  "prop":{
+    "name": "Name",
+    "addresses": "Addresses",
+    "emails": "Emails",
+    "websites": "Websites",
+    "activity": "Activity"
+    }
 }
 ```
 
