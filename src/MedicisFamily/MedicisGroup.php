@@ -3,7 +3,7 @@
 
 namespace SSITU\Medicis\MedicisFamily;
 
-use SSITU\JackTrades\Jack;
+use SSITU\Jack\Jack;
 
 class MedicisGroup implements MedicisGroup_i
 {
@@ -26,6 +26,7 @@ class MedicisGroup implements MedicisGroup_i
         $groupCollcs = $groupInfos['collcs'];
         $rslt = [];
         $bundle = [];
+        $transl = [];
         foreach ($groupCollcs as $collcId => $collcPaths) {
             $collcBuild = $this->MetaMedicis->getMedicisMember('Collc')->collcBuild($collcId, $translToo);
             $rslt['collcs-build'][$collcId] = $collcBuild;
@@ -37,23 +38,47 @@ class MedicisGroup implements MedicisGroup_i
                         if (!array_key_exists('err', $content)) {
                             $bundle[$subDir][$collcId] = $content;
                         } else {
-                            $rslt[$subDir . '-bundle']['err'][$collcId] = $content;
+                            $rslt[$subDir . '-bundle']['err'][$collcId] = $content['err'];
                         }
                     }
                 }
             }
         }
         if (!empty($bundle)) {
-            foreach ($bundle as $subDir => $collcData) {
-                if (!array_key_exists('err', $rslt[$subDir . '-bundle'])) {
-                    $bundlepath = $groupInfos['distDirPaths'][$subDir] . $groupId . '.json';
-                    $rslt[$subDir . '-bundle'] = Jack::File()->saveJson($collcData, $bundlepath, true);
+            if (!empty($bundle['config'])) {
+                $bundle['config'] = $this->groupConfig($bundle['config'], $groupInfos['groupSrcConfig']);
+                if (array_key_exists('err', $bundle['config'])) {
+                    $rslt['config-bundle']['err']['group-config'] = $bundle['config']['err'];
+                    unset($bundle['config']);
                 }
             }
+            $rslt = $this->createBundleFiles($groupId, $bundle, $groupInfos['distDirPaths'], $rslt);
         }
 
         if ($translToo === true) {
             $rslt['transl'] = $this->MetaMedicis->getMedicisMember('Transl')->groupTranslCheck($groupId);
+        }
+        return $rslt;
+    }
+
+    private function groupConfig($bundleConfig, $groupConfigPath)
+    {
+        $groupConfig = $this->MetaMedicis->getCollcFile($groupConfigPath);
+        if (!array_key_exists('err', $groupConfig)) {
+            $groupConfig['config']["items"] = $bundleConfig;
+            return $groupConfig['config'];
+        }
+        return $groupConfig;
+
+    }
+
+    private function createBundleFiles($groupId, $bundle, $distDirPaths, $rslt)
+    {
+        foreach ($bundle as $subDir => $collcData) {
+            if (!array_key_exists('err', $rslt[$subDir . '-bundle'])) {
+                $bundlepath = $distDirPaths[$subDir] . $groupId . '.json';
+                $rslt[$subDir . '-bundle'] = Jack::File()->saveJson($collcData, $bundlepath, true);
+            }
         }
         return $rslt;
     }

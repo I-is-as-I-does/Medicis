@@ -3,16 +3,15 @@
 
 namespace SSITU\Medicis\MedicisFamily;
 
-use SSITU\JackTrades\Jack;
+use SSITU\Jack\Jack;
 
 class MedicisTransl implements MedicisTransl_i
 {
 
     private $MetaMedicis;
     private $mainTranslPath;
-    private $trslprfx = 'collc.'; //@doc: prefix of keys in transl files, to avoid conflicts when possibly merging different transl sources (for offline caching for ex)
-    private $propsKey = 'prop.';
-    private $namesKey = 'name.';
+    private $propsKey = 'prop';
+    private $namesKey = 'name';
 
     public function __construct($MetaMedicis)
     {
@@ -38,17 +37,6 @@ class MedicisTransl implements MedicisTransl_i
         return $this->prcDoneAndTodo([$GroupId], $this->namesKey);
     }
 
-    private function fillDoneAndTodo($content, $trkey, $path)
-    {
-        $rslt = [];
-        if (empty($content) || empty($content[$trkey])) {
-            $rslt['rslt'] = '[todo]'; //@doc: [] to avoid case of 'todo' translation
-        } else {
-            $rslt['rslt'] = $content[$trkey];
-        }
-        return $rslt;
-    }
-
     private function prcDoneAndTodo($itemIds, $trslKey, $saveId = false)
     {
 
@@ -63,17 +51,19 @@ class MedicisTransl implements MedicisTransl_i
             $rslt[$lang] = [];
             $saveStock = [];
             $saveFile = false;
+            if(!array_key_exists($trslKey,$content)){
+                $content[$trslKey] = [];
+                $saveFile = true;
+            }
             foreach ($itemIds as $itemId) {
-                $trkey = $this->trslprfx . $trslKey . $itemId;
-                $subPrc = $this->fillDoneAndTodo($content, $trkey, $path);
-                if ($subPrc['rslt'] === '[todo]') {
-                    $rslt[$lang]['todo'][] = $itemId;
-                    if (!array_key_exists($trkey, $content)) {
-                        $content[$trkey] = '';
+                if (empty($content[$trslKey]) || empty($content[$trslKey][$itemId])) {
+                    $rslt[$lang]['todo'][] = $itemId; 
+                    if (!array_key_exists($itemId, $content[$trslKey])) {
+                        $content[$trslKey][$itemId] = '';
                         $saveFile = true;
                     }
                 } elseif ($saveId !== false) {
-                    $saveStock[$trkey] = $subPrc['rslt'];
+                    $saveStock[$trslKey][$itemId] = $content[$trslKey][$itemId];
                 }
             }
             if (!empty($rslt[$lang]['todo'])) {

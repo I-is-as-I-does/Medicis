@@ -1,8 +1,20 @@
 {
-    "c-media-files": {
-        "priority": 1,
-        "status": "required",
-        "auth": 1,
-        "template": "files"
+    "userEditable": [
+        "priority"
+    ],
+    "header": true,
+    "status": "required",
+    "priority": 2,
+    "items": {
+        "c-media-files": {
+            "userEditable": [
+                "priority",
+                "auth"
+            ],
+            "priority": 1,
+            "status": "required",
+            "auth": 1,
+            "template": "files"
+        }
     }
 }

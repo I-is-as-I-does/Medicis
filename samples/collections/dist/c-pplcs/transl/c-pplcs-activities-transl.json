@@ -1,4 +1,6 @@
 {
-    "collc.prop.activity": "Activit\u00e9",
-    "collc.prop.label": "\u00c9tiquette"
+    "prop": {
+        "label": "\u00c9tiquette",
+        "activity": "Activit\u00e9"
+    }
 }

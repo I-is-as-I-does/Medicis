@@ -1,16 +1,20 @@
 {
-    "collc.name.c-media": "",
-    "collc.name.c-media-files": "",
-    "collc.name.c-pplcs": "People and Places",
-    "collc.name.c-pplcs-activities": "",
-    "collc.name.c-pplcs-contacts": "",
-    "collc.prop.activities": "Activities",
-    "collc.prop.activity": "Activity",
-    "collc.prop.addresses": "Addresses",
-    "collc.prop.credits": "",
-    "collc.prop.emails": "Emails",
-    "collc.prop.label": "Label",
-    "collc.prop.name": "Name",
-    "collc.prop.path": "",
-    "collc.prop.websites": "Websites"
+  "name": {
+    "c-media": "",
+    "c-media-files": "",
+    "c-pplcs": "People and Places",
+    "c-pplcs-activities": "",
+    "c-pplcs-contacts": ""
+  },
+  "prop": {
+    "activities": "Activities",
+    "activity": "Activity",
+    "addresses": "Addresses",
+    "credits": "",
+    "emails": "Emails",
+    "label": "Label",
+    "name": "Name",
+    "path": "",
+    "websites": "Websites"
+  }
 }

@@ -1,0 +1,8 @@
+{
+  "config": {
+    "userEditable": ["priority"],
+    "header": true,
+    "status": "required",
+    "priority": 1
+  }
+}

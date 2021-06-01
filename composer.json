@@ -21,8 +21,7 @@
     },
     "autoload": {
         "psr-4": {
-            "SSITU\\Medicis\\": "src",
-            "SSITU\\Medicis\\MedicisFamily\\": "src/MedicisFamily/"
+            "SSITU\\Medicis\\": "src"
         }
     }
 }
