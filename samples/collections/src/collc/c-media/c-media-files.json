@@ -16,6 +16,7 @@
     ],
     "config":
     {
+      "userEditable":["priority","auth"],
       "priority":1,
       "status": "required",
       "auth": 1,

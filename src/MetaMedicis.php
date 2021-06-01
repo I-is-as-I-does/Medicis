@@ -3,7 +3,7 @@
 
 namespace SSITU\Medicis;
 
-use SSITU\JackTrades\Jack;
+use SSITU\Jack\Jack;
 
 class MetaMedicis implements MetaMedicis_i
 {

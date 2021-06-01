@@ -3,7 +3,7 @@
 
 namespace SSITU\Medicis\MedicisFamily;
 
-use SSITU\JackTrades\Jack;
+use SSITU\Jack\Jack;
 
 class MedicisGroup implements MedicisGroup_i
 {
@@ -38,14 +38,21 @@ class MedicisGroup implements MedicisGroup_i
                         if (!array_key_exists('err', $content)) {
                             $bundle[$subDir][$collcId] = $content;
                         } else {
-                            $rslt[$subDir . '-bundle']['err'][$collcId] = $content;
+                            $rslt[$subDir . '-bundle']['err'][$collcId] = $content['err'];
                         }
                     }
                 }
             }
         }
         if (!empty($bundle)) {
-            $rslt = $this->createBundleFiles($groupId, $bundle, $rslt);
+            if (!empty($bundle['config'])) {
+                $bundle['config'] = $this->groupConfig($bundle['config'], $groupInfos['groupSrcConfig']);
+                if (array_key_exists('err', $bundle['config'])) {
+                    $rslt['config-bundle']['err']['group-config'] = $bundle['config']['err'];
+                    unset($bundle['config']);
+                }
+            }
+            $rslt = $this->createBundleFiles($groupId, $bundle, $groupInfos['distDirPaths'], $rslt);
         }
 
         if ($translToo === true) {
@@ -54,29 +61,26 @@ class MedicisGroup implements MedicisGroup_i
         return $rslt;
     }
 
-    private function createBundleFiles($groupId, $bundle, $rslt)
+    private function groupConfig($bundleConfig, $groupConfigPath)
+    {
+        $groupConfig = $this->MetaMedicis->getCollcFile($groupConfigPath);
+        if (!array_key_exists('err', $groupConfig)) {
+            $groupConfig['config']["items"] = $bundleConfig;
+            return $groupConfig['config'];
+        }
+        return $groupConfig;
+
+    }
+
+    private function createBundleFiles($groupId, $bundle, $distDirPaths, $rslt)
     {
         foreach ($bundle as $subDir => $collcData) {
             if (!array_key_exists('err', $rslt[$subDir . '-bundle'])) {
-                $bundlepath = $groupInfos['distDirPaths'][$subDir] . $groupId . '.json';
-                if ($subDir != 'transl') {
-                    $rslt[$subDir . '-bundle'] = Jack::File()->saveJson($collcData, $bundlepath, true);
-                } else {
-                    $rslt[$subDir . '-bundle'] = $this->splitTransl($collcData,$bundlepath);
-                }
+                $bundlepath = $distDirPaths[$subDir] . $groupId . '.json';
+                $rslt[$subDir . '-bundle'] = Jack::File()->saveJson($collcData, $bundlepath, true);
             }
         }
         return $rslt;
-    }
-
-    private function splitTransl($collcData,$bundlepath){
-        $basePath = dirname($bundlepath).basename($bundlepath,'.json');
-        $names = [];
-        $props = [];
-        foreach($collcData as $collcId => $collcTransl){
-           
-        }
-
     }
 
 }

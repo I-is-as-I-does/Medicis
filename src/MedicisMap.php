@@ -43,8 +43,9 @@ class MedicisMap implements MedicisMap_i
         $groupPaths = glob($this->dirMap['src/collc'] . '*/', GLOB_ONLYDIR);
         foreach ($groupPaths as $groupPath) {
             $groupId = basename($groupPath);
-            $srcPaths = glob($groupPath . '*.json');
+            $srcPaths = glob($groupPath . $groupId.'-*.json');
             $distDirPaths = $this->groupDistPaths($groupId);
+            $this->collcMap[$groupId]['groupSrcConfig'] = $groupPath.$groupId.'.json';
             $this->collcMap[$groupId]['distDirPaths'] = $distDirPaths;
 
             foreach ($srcPaths as $srcPath) {

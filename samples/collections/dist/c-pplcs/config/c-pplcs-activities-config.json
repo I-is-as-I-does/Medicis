@@ -1,4 +1,8 @@
 {
+    "userEditable": [
+        "priority",
+        "auth"
+    ],
     "priority": 2,
     "status": "required",
     "auth": 1,
