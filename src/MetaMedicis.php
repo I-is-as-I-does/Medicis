@@ -5,8 +5,7 @@ namespace SSITU\Medicis;
 
 use SSITU\Jack\Jack;
 
-class MetaMedicis implements MetaMedicis_i
-{
+class MetaMedicis implements MetaMedicis_i {
     private $MedicisMap;
 
     private $MedicisSchema;
@@ -64,14 +63,14 @@ class MetaMedicis implements MetaMedicis_i
         return $src;
     }
 
-    public function getCollcFile($PathOrId, $dirKey = '')
+    public function getCollcFile($PathOrId, $dirKey = '', $lang = false)
     {
         if (substr($PathOrId, -5) == '.json') {
             $path = $PathOrId;
         } elseif ($dirKey == 'src') {
             $path = $this->MedicisMap->getCollcSrcPath($PathOrId);
         } elseif (!empty($dirKey)) {
-            $path = $this->MedicisMap->getCollcDistPath($PathOrId, $dirKey);
+            $path = $this->MedicisMap->getDistPath($PathOrId, $dirKey, false, $lang);
         }
         if (!empty($path) && is_file($path)) {
             $content = Jack::File()->readJson($path);
@@ -82,11 +81,11 @@ class MetaMedicis implements MetaMedicis_i
         return ['err' => 'Unvalid content, path or id: ' . $PathOrId];
     }
 
-    public function saveDistFile($content, $collcId, $subDir)
+    public function saveDistFile($content, $Id, $subDir, $group = false, $lang = false)
     {
-        $path = $this->MedicisMap->getCollcDistPath($collcId, $subDir);
+        $path = $this->MedicisMap->getDistPath($Id, $subDir, $group, $lang);
         if ($path === false) {
-            return ['err' => 'Unvalid collection Id "' . $collcId . '" or sub directory "' . $subDir . '"'];
+            return ['err' => 'Unvalid Id "' . $Id . '" or sub directory "' . $subDir . '"'];
         }
         return Jack::File()->saveJson($content, $path, true);
     }

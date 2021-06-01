@@ -9,14 +9,14 @@ class MedicisTransl implements MedicisTransl_i
 {
 
     private $MetaMedicis;
-    private $mainTranslPath;
+    private $translMap;
     private $propsKey = 'prop';
     private $namesKey = 'name';
 
     public function __construct($MetaMedicis)
     {
         $this->MetaMedicis = $MetaMedicis;
-        $this->mainTranslPath = $MetaMedicis->getMedicisMap()->getDir('src/transl');
+        $this->translMap = $MetaMedicis->getMedicisMap()->getTranslMap();
     }
 
     public function collcTranslBuild($collcId, $sch = [])
@@ -25,68 +25,76 @@ class MedicisTransl implements MedicisTransl_i
         if (array_key_exists('err', $sch)) {
             return $sch;
         }
-        $propIds = array_keys($sch['properties']);
-        $rslt = [];
-        $rslt['properties'] = $this->prcDoneAndTodo($propIds, $this->propsKey, $collcId);
-        $rslt['name'] = $this->prcDoneAndTodo([$collcId], $this->namesKey, $collcId);
-        return $rslt;
+        $translJob = [$this->propsKey => array_keys($sch['properties']), $this->namesKey => [$collcId]];
+        return $this->prcDoneAndTodo($translJob, $collcId);
     }
 
-    public function groupTranslCheck($GroupId)
+    public function groupTranslBuild($GroupId)
     {
-        return $this->prcDoneAndTodo([$GroupId], $this->namesKey);
+        return $this->prcDoneAndTodo([$this->namesKey => [$GroupId]]);
+
     }
 
-    private function prcDoneAndTodo($itemIds, $trslKey, $saveId = false)
+    private function prcDoneAndTodo($translJob, $saveId = false)
     {
-
-        $files = glob($this->mainTranslPath . 'collections-*.json');
-        if (empty($files)) {
+        if (empty($this->translMap)) {
             return ["anomaly" => "No translation files found"];
         }
         $rslt = [];
-        foreach ($files as $path) {
+        foreach ($this->translMap as $lang => $path) {
             $content = Jack::File()->readJson($path);
-            $lang = $this->extractLang($path);
-            $rslt[$lang] = [];
-            $saveStock = [];
+            $doneStock = [];
             $saveFile = false;
-            if(!array_key_exists($trslKey,$content)){
-                $content[$trslKey] = [];
-                $saveFile = true;
-            }
-            foreach ($itemIds as $itemId) {
-                if (empty($content[$trslKey]) || empty($content[$trslKey][$itemId])) {
-                    $rslt[$lang]['todo'][] = $itemId; 
+            foreach ($translJob as $trslKey => $itemIds) {
+                if (!array_key_exists($trslKey, $content)) {
+                    $content[$trslKey] = [];
+                    $saveFile = true;
+                }
+                if (empty($content[$trslKey])) {
+                    $rslt['todo'][$lang] = $itemIds;
+                    foreach ($itemIds as $itemId) {
+                        $content[$trslKey][$itemId] = '';
+                    }
+                    $saveFile = true;
+                    continue;
+                }
+
+                foreach ($itemIds as $itemId) {
                     if (!array_key_exists($itemId, $content[$trslKey])) {
                         $content[$trslKey][$itemId] = '';
                         $saveFile = true;
                     }
-                } elseif ($saveId !== false) {
-                    $saveStock[$trslKey][$itemId] = $content[$trslKey][$itemId];
+                    if (!empty($content[$trslKey][$itemId])) {
+                        $doneStock[$trslKey][$itemId] = $content[$trslKey][$itemId];
+                    } else {
+                        $rslt['todo'][$lang][] = $itemId;
+                    }
                 }
             }
-            if (!empty($rslt[$lang]['todo'])) {
-                $rslt[$lang]['todo'] = implode("; ", $rslt[$lang]['todo']);
+            if (!empty($rslt['todo'][$lang])) {
+                $rslt['todo'][$lang] = implode("; ", $rslt['todo'][$lang]);
                 if ($saveFile) {
-                    ksort($content);
-                    $rslt[$lang]['file-update'] = Jack::File()->saveJson($content, $path, true);
+                    $save = Jack::File()->saveJson($content, $path, true);
+                    if (array_key_exists('err', $save)) {
+                        $rslt['err'][$lang]['file-update'] = $save['err'];
+                    } else {
+                        $rslt['success'][$lang]['file-update'] = $save['success'];
+                    }
                 }
+            } elseif ($saveId !== false) {
+                $finalSave = $this->MetaMedicis->saveDistFile($doneStock, $saveId, 'transl', false, $lang);
+                if (array_key_exists('err', $finalSave)) {
+                    $rslt['err'][$lang]['save-transl'] = $finalSave['err'];
+                } else {
+                    $rslt['success'][$lang]['save-transl'] = $finalSave['success'];
+                }
+
             } else {
-                $rslt[$lang]['success'] = "all done";
-                if ($saveId !== false) {
-                    ksort($saveStock);
-                    $rslt[$lang]['save-transl'] = $this->MetaMedicis->saveDistFile($saveStock, $saveId, 'transl');
-                }
+                $rslt['success'][$lang] = $doneStock;
             }
+
         }
         return $rslt;
-    }
-
-    private function extractLang($path)
-    {
-        $parts = explode('-', basename($path, '.json'));
-        return array_pop($parts);
     }
 
 }

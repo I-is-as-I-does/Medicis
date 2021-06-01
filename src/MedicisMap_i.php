@@ -8,6 +8,8 @@ interface MedicisMap_i
     public function __construct($collectionDirPath);
     public function getLog();
     public function getCollcMap();
+    public function getTranslMap();
+    public function getAvailableLangs();
     public function getCollcIndex();
     public function getDirMap();
     public function getDir($dirKey);
@@ -17,7 +19,7 @@ interface MedicisMap_i
     public function getGroupId($collcId);
     public function getCollcInfos($collcId);
     public function getCollcSrcPath($collcId);
-    public function getCollcDistPath($collcId, $subDir);
+    public function getDistPath($Id, $subDir, $group = false, $lang = false);
     public function getDistDirStruct();
     public function getAllGroupIds();
     public function getAllCollcIds();

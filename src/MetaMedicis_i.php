@@ -10,6 +10,6 @@ interface MetaMedicis_i
     public function getMedicisMember($member);
     public function quickCheckSchema($collcId, $sch = array());
     public function quickCheckSrc($collcId, $src = array());
-    public function getCollcFile($PathOrId, $dirKey = '');
-    public function saveDistFile($content, $collcId, $subDir);
+    public function getCollcFile($PathOrId, $dirKey = '', $lang = false);
+    public function saveDistFile($content, $Id, $subDir, $group = false, $lang = false);
 }

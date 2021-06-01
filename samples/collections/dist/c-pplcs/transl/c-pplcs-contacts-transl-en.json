@@ -1,0 +1,13 @@
+{
+    "prop": {
+        "label": "Label",
+        "name": "Name",
+        "activities": "Activities",
+        "emails": "Emails",
+        "addresses": "Addresses",
+        "websites": "Websites"
+    },
+    "name": {
+        "c-pplcs-contacts": "People and Places | Contacts"
+    }
+}

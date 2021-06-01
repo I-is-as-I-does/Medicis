@@ -6,16 +6,6 @@
     "status": "required",
     "priority": 1,
     "items": {
-        "c-pplcs-activities": {
-            "userEditable": [
-                "priority",
-                "auth"
-            ],
-            "priority": 2,
-            "status": "required",
-            "auth": 1,
-            "template": "collections"
-        },
         "c-pplcs-contacts": {
             "userEditable": [
                 "priority",
