@@ -55,9 +55,6 @@ class MedicisCollc implements MedicisCollc_i
             if ($v['type'] == 'object') {
                 $data[$k] = $this->iterateOnSchProps($v['properties'], $targ);
             } else {
-                if ($v['type'] == 'array') {
-                    $v = $v['items'];
-                }
                 if (array_key_exists($targ, $v)) {
                     $data[$k] = $v[$targ];
                 }
