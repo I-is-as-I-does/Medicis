@@ -3,8 +3,9 @@
 
 namespace SSITU\Medicis\MedicisFamily;
 
-class MedicisSchema implements MedicisSchema_i
-{
+use SSITU\Jack\Jack;
+
+class MedicisSchema implements MedicisSchema_i {
 
     private $MetaMedicis;
     private $MedicisModels;
@@ -21,77 +22,129 @@ class MedicisSchema implements MedicisSchema_i
         if (array_key_exists('err', $src)) {
             return $src;
         }
-
-        $props = $this->prcPropreties($src);
-        if (array_key_exists('err', $props)) {
-            return $props;
+        if (!array_key_exists('props', $src)) {
+            return ['err' => 'invalid source'];
         }
-        if (!array_key_exists('required', $src)) {
-            $required = [];
-        } else {
-            $required = $src['required'];
+        $build = $this->prcProperties($src);
+        if (array_key_exists('err', $build)) {
+            return $build;
         }
-        $check = $this->checkValidity($props, $required);
-        if ($check !== true) {
-            return $check;
+        $sch = array_merge($this->schWrap($collcId), $this->coWrap($build['props'], $build['required']));
+        if (!empty($build['defs'])) {
+            $sch["definitions"] = $build['defs'];
         }
-
-        return $this->schWrap($collcId, $required, $props);
+        return $sch;
     }
 
-    private function schWrap($collcId, $required, $props)
+    private function subschWrap($id)
+    {
+        return ['$id' => "#/properties/" . $id,
+            'title' => Jack::Help()->UpCamelCase($id),
+        ];
+    }
+
+    private function coWrap($props, $required, $adtProp = false)
+    {
+        return ['type' => 'object',
+            "required" => $required,
+            "additionalProperties" => $adtProp,
+            "properties" => $props];
+    }
+
+    private function schWrap($collcId)
     {
         return [
             '$schema' => "http://json-schema.org/draft-07/schema",
             '$id' => $collcId . '.json',
             'title' => $collcId,
-            "type" => "object",
-            "required" => $required,
-            "properties" => $props,
-            "additionalProperties" => false,
         ];
     }
 
-    private function prcPropreties($src)
+    private function isValidSubsch($src, $subId)
     {
-        if (empty($src['props']) || !is_array($src['props'])) {
-            return ['err' => 'Unvalid source: no properties data'];
-        }
+        return (is_array($src['subschemas']) && !empty($src['subschemas'][$subId]));
+    }
 
-        $props = [];
-        foreach ($src['props'] as $k => $info) {
+    private function prcProperties($src, $subSrc = false)
+    {       $job = $src;
+        if($subSrc !== false){
+            $job = $subSrc;
+        }
+        if (empty($job['props']) || !is_array($job['props'])) {
+            return ['err' => 'invalid source'];
+        }
+        $build = [
+            "props" => [],
+            "required" => [],
+            "defs" => [],
+        ];
+
+        foreach ($job['props'] as $k => $info) {
 
             if (empty($info['method'])) {
                 return ['err' => 'A MedicisModels method has not been specified for prop n."' . $k + 1 . '"'];
             }
             $method = $info['method'];
 
-            if (empty($info['param'])) {
-                $info['param'] = [lcfirst($method)];
+            if (empty($info['argm'])) {
+                $info['argm'] = [lcfirst($method)];
             }
 
-            $param = $info['param'];
-            $id = $param[0];
+            $argm = $info['argm'];
+            $id = $argm[0];
 
             if (!method_exists($this->MedicisModels, $method)) {
                 return ['err' => 'method "' . $method . '" does not exist in MedicisModels'];
             }
-            $props[$id] = $this->MedicisModels->$method(...$param);
+            $build["props"][$id] = $this->MedicisModels->$method(...$argm);
+            if ($method === 'ObjectsArray') {
+                $subPrc = $this->prcSubProperties($src, $build['defs'], $id, $argm);
+                if (array_key_exists('err', $subPrc)) {
+                    return $subPrc;
+                }
+                $build['defs'] = $subPrc;
+            }
         }
-        return $props;
+        if (array_key_exists('required', $job)) {
+            $build["required"] = $job['required'];
+        }
+        $check = $this->checkValidity($build["props"], $build["required"]);
+        if ($check !== true) {
+            return $check;
+        }
+        return $build;
     }
 
-    private function checkValidity($props, $required)
+    private function prcSubProperties($src, $defs, $id, $argm)
     {
+        if (empty($argm[1]) || !$this->isValidSubsch($src, $argm[1])) {
+            return ['err' => 'Unvalid source: subschema not found for "' . $id . '"'];
+        }
+        $subprc = $this->prcProperties($src, $src['subschemas'][$argm[1]]);
+        if (array_key_exists('err', $subprc)) {
+            return $subprc;
+        }
+        $subprops = $subprc['props'];
+        if (!empty($subprc['defs'])) {
+            $defs = array_merge($defs, $subprc['defs']);
+        }
+        $subAdtProp = !empty($argm[2]);
+        $defs[$argm[1]] = array_merge($this->subschWrap($argm[1]), $this->coWrap($subprc['props'], $subprc['required'], $subAdtProp));
+        return $defs;
+    }
+
+    private function checkValidity($builtprops, $required)
+    {
+
         $logErr = [];
-        foreach ($props as $k => $prop) {
-            if (!is_array($prop)) {
-                $logErr[] = 'Unvalid schema property: ' . $k . '; ' . $prop;
+        foreach ($builtprops as $k => $builtprop) {
+            if (!is_array($builtprop)) {
+                $logErr[] = 'Unvalid schema property: ' . $k . '; ' . $builtprop;
             }
         }
         if (!empty($required)) {
             foreach ($required as $propk) {
-                if (!array_key_exists($propk, $props)) {
+                if (!array_key_exists($propk, $builtprops)) {
                     $logErr[] = 'Missing required schema property: ' . $propk;
                 }
             }

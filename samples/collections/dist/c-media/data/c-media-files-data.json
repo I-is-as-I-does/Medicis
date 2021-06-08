@@ -1,8 +1,8 @@
 {
-    "label": "Record Label",
-    "path": "path\/to\/file.ext",
-    "credits": {
-        "relPointer": "c-pplcs-contacts-data.json#\/123e4567-e89b-12d3-a456-426614174000",
-        "relLabel": "Related Item Label"
-    }
+  "label": "Record Label",
+  "path": "path/to/file.ext",
+  "credits": {
+    "relPointer": "c-pplcs-contacts-exmpl.json#/123e4567-e89b-12d3-a456-426614174000",
+    "relLabel": "Related Item Label"
+  }
 }

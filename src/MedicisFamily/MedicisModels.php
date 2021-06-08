@@ -3,13 +3,15 @@
 
 namespace SSITU\Medicis\MedicisFamily;
 
+use SSITU\Jack\Jack;
+
 class MedicisModels implements MedicisModels_i {
     private $MedicisMap;
 
-    public $currenciesCodes = ["AFN", "ARS", "AWG", "AUD", "AZN", "BSD", "BBD", "BDT", "BYN", "BZD", "BMD", "BOP", "BAM", "BWP", "BGN", "BRL", "BND", "KHR", "CAD", "KYD", "CLP", "CNY", "COP", "CRC", "HRK", "CUP", "CZK", "DKK", "DOP", "XCD", "EGP", "SVC", "EEK", "EUR", "FKP", "FJD", "GHC", "GIP", "GTQ", "GGP", "GYD", "HNL", "HKD", "HUF", "ISK", "INR", "IDR", "IRR", "IMP", "ILS", "JMD", "JPY", "JEP", "KZT", "KPW", "KGS", "LAK", "LVL", "LBP", "LRD", "LTL", "MKD", "MYR", "MUR", "MXN", "MNT", "MZN", "NAD", "NPR", "ANG", "NZD", "NIO", "NGN", "NOK", "OMR", "PKR", "PAB", "PYG", "PEN", "PHP", "PLN", "QAR", "RON", "RUB", "SHP", "SAR", "RSD", "SCR", "SGD", "SBD", "SOS", "ZAR", "LKR", "SEK", "CHF", "SRD", "SYP", "TWD", "THB", "TTD", "TRY", "TVD", "UAH", "GBP", "UGX", "USD", "UYU", "UZS", "VEF", "VND", "ZWD"
-     ]; 
+    public $currenciesCodes = ["AFN", "ARS", "AWG", "AUD", "AZN", "BSD", "BBD", "BDT", "BYN", "BZD", "BMD", "BOP", "BAM", "BWP", "BGN", "BRL", "BND", "KHR", "CAD", "KYD", "CLP", "CNY", "COP", "CRC", "HRK", "CUP", "CZK", "DKK", "DOP", "XCD", "EGP", "SVC", "EEK", "EUR", "FKP", "FJD", "GHC", "GIP", "GTQ", "GGP", "GYD", "HNL", "HKD", "HUF", "ISK", "INR", "IDR", "IRR", "IMP", "ILS", "JMD", "JPY", "JEP", "KZT", "KPW", "KGS", "LAK", "LVL", "LBP", "LRD", "LTL", "MKD", "MYR", "MUR", "MXN", "MNT", "MZN", "NAD", "NPR", "ANG", "NZD", "NIO", "NGN", "NOK", "OMR", "PKR", "PAB", "PYG", "PEN", "PHP", "PLN", "QAR", "RON", "RUB", "SHP", "SAR", "RSD", "SCR", "SGD", "SBD", "SOS", "ZAR", "LKR", "SEK", "CHF", "SRD", "SYP", "TWD", "THB", "TTD", "TRY", "TVD", "UAH", "GBP", "UGX", "USD", "UYU", "UZS", "VEF", "VND", "ZWD",
+    ];
 
-     public $langCodes = ['ab','aa','af','ak','sq','am','ar','an','hy','as','av','ae','ay','az','bm','ba','eu','be','bn','bh','bi','bs','br','bg','my','ca','km','ch','ce','ny','zh','cu','cv','kw','co','cr','hr','cs','da','dv','nl','dz','en','eo','et','ee','fo','fj','fi','fr','ff','gd','gl','lg','ka','de','ki','el','kl','gn','gu','ht','ha','he','hz','hi','ho','hu','is','io','ig','id','ia','ie','iu','ik','ga','it','ja','jv','kn','kr','ks','kk','rw','kv','kg','ko','kj','ku','ky','lo','la','lv','lb','li','ln','lt','lu','mk','mg','ms','ml','mt','gv','mi','mr','mh','ro','mn','na','nv','nd','ng','ne','se','no','nb','nn','ii','oc','oj','or','om','os','pi','pa','ps','fa','pl','pt','qu','rm','rn','ru','sm','sg','sa','sc','sr','sn','sd','si','sk','sl','so','st','nr','es','su','sw','ss','sv','tl','ty','tg','ta','tt','te','th','bo','ti','to','ts','tn','tr','tk','tw','ug','uk','ur','uz','ve','vi','vo','wa','cy','fy','wo','xh','yi','yo','za','zu'];
+    public $langCodes = ['ab', 'aa', 'af', 'ak', 'sq', 'am', 'ar', 'an', 'hy', 'as', 'av', 'ae', 'ay', 'az', 'bm', 'ba', 'eu', 'be', 'bn', 'bh', 'bi', 'bs', 'br', 'bg', 'my', 'ca', 'km', 'ch', 'ce', 'ny', 'zh', 'cu', 'cv', 'kw', 'co', 'cr', 'hr', 'cs', 'da', 'dv', 'nl', 'dz', 'en', 'eo', 'et', 'ee', 'fo', 'fj', 'fi', 'fr', 'ff', 'gd', 'gl', 'lg', 'ka', 'de', 'ki', 'el', 'kl', 'gn', 'gu', 'ht', 'ha', 'he', 'hz', 'hi', 'ho', 'hu', 'is', 'io', 'ig', 'id', 'ia', 'ie', 'iu', 'ik', 'ga', 'it', 'ja', 'jv', 'kn', 'kr', 'ks', 'kk', 'rw', 'kv', 'kg', 'ko', 'kj', 'ku', 'ky', 'lo', 'la', 'lv', 'lb', 'li', 'ln', 'lt', 'lu', 'mk', 'mg', 'ms', 'ml', 'mt', 'gv', 'mi', 'mr', 'mh', 'ro', 'mn', 'na', 'nv', 'nd', 'ng', 'ne', 'se', 'no', 'nb', 'nn', 'ii', 'oc', 'oj', 'or', 'om', 'os', 'pi', 'pa', 'ps', 'fa', 'pl', 'pt', 'qu', 'rm', 'rn', 'ru', 'sm', 'sg', 'sa', 'sc', 'sr', 'sn', 'sd', 'si', 'sk', 'sl', 'so', 'st', 'nr', 'es', 'su', 'sw', 'ss', 'sv', 'tl', 'ty', 'tg', 'ta', 'tt', 'te', 'th', 'bo', 'ti', 'to', 'ts', 'tn', 'tr', 'tk', 'tw', 'ug', 'uk', 'ur', 'uz', 've', 'vi', 'vo', 'wa', 'cy', 'fy', 'wo', 'xh', 'yi', 'yo', 'za', 'zu'];
 
     public function __construct($MetaMedicis)
     {
@@ -17,56 +19,46 @@ class MedicisModels implements MedicisModels_i {
 
     }
 
-    private function prcTitle($id)
-    {
-        if (stripos($id, '/') !== false) {
-            $split = explode('/', $id);
-            $id = array_shift($split);
 
-            foreach ($split as $part) {
-                $id .= ucfirst($part);
-            }}
-        return $id;
-    }
-
-    public function baseArray($id, $arrMinMax = [null,null], $unique = true)
+    public function baseArray($id, $arrMinMax = [null, null], $unique = true)
     {
         $prop = [];
         $prop['$id'] = "#/properties/" . $id;
-        $prop['title'] = $this->prcTitle($id);
+        $prop['title'] = Jack::Help()->UpCamelCase($id);
         $prop['type'] = 'array';
         $prop["uniqueItems"] = $unique;
-        if(is_int($arrMinMax[1])){
-            $prop["maxItems"] = $arrMinMax[1]; 
-            } else {
-                $prop["additionalItems"] = true;
-            }
-            if(is_int($arrMinMax[0])){
-                $prop["minItems"] = $arrMinMax[0]; 
-            }      
+        if (is_int($arrMinMax[1])) {
+            $prop["maxItems"] = $arrMinMax[1];
+        } else {
+            $prop["additionalItems"] = true;
+        }
+        if (is_int($arrMinMax[0])) {
+            $prop["minItems"] = $arrMinMax[0];
+        }
         return $prop;
     }
 
-    private function fillArrayNumExample($prop, $arrMinMax, $MinMax){
-        if(is_null($arrMinMax[0]) || $arrMinMax[0] < 2){
+    private function fillArrayNumExample($prop, $arrMinMax, $MinMax)
+    {
+        if (is_null($arrMinMax[0]) || $arrMinMax[0] < 2) {
             return $this->fillArrayExample($prop, $arrMinMax);
         }
-        if(!is_int($MinMax[0])){
+        if (!is_int($MinMax[0])) {
             $MinMax[0] = 0;
         }
-        if(!is_int($MinMax[1])){
+        if (!is_int($MinMax[1])) {
             $MinMax[1] = 142;
         }
         $prop["example"] = [$MinMax[0]];
-        if($arrMinMax[0] > 2){
+        if ($arrMinMax[0] > 2) {
             $existant = $prop["items"]['example'];
             $floor = 2;
-            if(!in_array($existant, $MinMax)){
+            if (!in_array($existant, $MinMax)) {
                 $prop["example"][] = $existant;
                 $floor++;
-            }        
-            if($arrMinMax[0] > $floor){
-                for($c=$floor; $c<$arrMinMax[0]; $c++){
+            }
+            if ($arrMinMax[0] > $floor) {
+                for ($c = $floor; $c < $arrMinMax[0]; $c++) {
                     $prop["example"][] = random_int($MinMax[0], $MinMax[1]);
                 }
             }
@@ -75,47 +67,56 @@ class MedicisModels implements MedicisModels_i {
         return $prop;
     }
 
-    private function fillArrayExample($prop, $arrMinMax){
-        $prop["example"] = [$prop["items"]['example']];
-        if($arrMinMax[0] > 1){
-            
-            for($c=1; $c<$arrMinMax[0]; $c++){
-                $prop["example"][] = $prop["example"][0];
+    private function fillArrayExample($prop, $arrMinMax)
+    {
+        $exmpl = $prop["items"]['example'];
+        $prop["example"][] = $exmpl;
+        if ($arrMinMax[0] > 1) {
+
+            for ($c = 1; $c < $arrMinMax[0]; $c++) {
+                $prop["example"][] = $exmpl;
             }
         }
         return $prop;
     }
 
-    public function EmailsArray($id, $arrMinMax = [null,null])
-    {      
+    public function ObjectsArray($id, $subSchemaId, $adtProp = false, $arrMinMax = [null, null])
+    {
+        $prop = $this->baseArray($id, $arrMinMax);
+        $prop["items"] = [ '$ref'=> "#/definitions/".$subSchemaId ];
+        return $prop;
+    }
+
+    public function EmailsArray($id, $arrMinMax = [null, null])
+    {
         $prop = $this->baseArray($id, $arrMinMax);
         $prop["items"] = $this->Email($id . '/items');
-        
+
         return $this->fillArrayExample($prop, $arrMinMax);
     }
 
-    public function RefsArray($id, $refKey, $arrMinMax = [null,null])
+    public function RefsArray($id, $refKey, $arrMinMax = [null, null])
     {
         $prop = $this->baseArray($id, $arrMinMax);
         $prop["items"] = $this->UniqueRef($id . '/items', $refKey);
         return $this->fillArrayExample($prop, $arrMinMax);
     }
 
-    public function BoolsArray($id, $default = null, $arrMinMax = [null,null])
+    public function BoolsArray($id, $default = null, $arrMinMax = [null, null])
     {
         $prop = $this->baseArray($id, $arrMinMax, false);
         $prop["items"] = $this->Bool($id . '/items', $default);
         return $this->fillArrayExample($prop, $arrMinMax);
     }
 
-    public function StringsArray($id, $itExample, $lenMinMax = [null,null], $itPattern = false, $arrMinMax = [null,null], $unique = true)
+    public function StringsArray($id, $itExample, $lenMinMax = [null, null], $itPattern = false, $arrMinMax = [null, null], $unique = true)
     {
         $prop = $this->baseArray($id, $arrMinMax, $unique);
         $prop["items"] = $this->String($id . '/items', $itExample, $lenMinMax, $itPattern);
         return $this->fillArrayExample($prop, $arrMinMax);
     }
 
-    public function NumbersArray($id, $MinMax = [null,null], $arrMinMax = [null,null], $unique = false)
+    public function NumbersArray($id, $MinMax = [null, null], $arrMinMax = [null, null], $unique = false)
     {
         $prop = $this->baseArray($id, $arrMinMax, $unique);
         $prop["items"] = $this->Number($id . '/items', $MinMax);
@@ -133,7 +134,7 @@ class MedicisModels implements MedicisModels_i {
     public function NanoId($id = 'id', $pattern = '[\w\-]{21}')
     {
         $example = 'V1StGXR8_Z5jdHi6B-myT';
-        $prop = $this->String($id, $example, [21,21],$pattern);
+        $prop = $this->String($id, $example, [21, 21], $pattern);
 
         return $prop;
     }
@@ -142,7 +143,7 @@ class MedicisModels implements MedicisModels_i {
     {
         $prop = [];
         $prop['$id'] = "#/properties/" . $id;
-        $prop['title'] = $this->prcTitle($id);
+        $prop['title'] = Jack::Help()->UpCamelCase($id);
         $prop['type'] = 'boolean';
         $prop["example"] = false;
         if ($default !== null) {
@@ -161,11 +162,11 @@ class MedicisModels implements MedicisModels_i {
         return $prop;
     }
 
-    public function String($id, $example, $lenMinMax = [null,null], $pattern = false)
+    public function String($id, $example, $lenMinMax = [null, null], $pattern = false)
     {
         $prop = [];
         $prop['$id'] = "#/properties/" . $id;
-        $prop['title'] = $this->prcTitle($id);
+        $prop['title'] = Jack::Help()->UpCamelCase($id);
         $prop['type'] = 'string';
 
         $prop['example'] = $example;
@@ -180,32 +181,35 @@ class MedicisModels implements MedicisModels_i {
         }
         return $prop;
     }
-    public function IsoDate($id){
-        $example = explode('T',date("c"))[0];
+    public function IsoDate($id)
+    {
+        $example = explode('T', date("c"))[0];
         $prop = $this->String($id, $example);
         $prop["format"] = "date";
-        return $prop;       
+        return $prop;
     }
 
-    public function IsoTime($id){
-        $example = explode('T',date("c"))[1];
+    public function IsoTime($id)
+    {
+        $example = explode('T', date("c"))[1];
         $prop = $this->String($id, $example);
         $prop["format"] = "time";
-        return $prop;       
+        return $prop;
     }
 
-    public function IsoDateTime($id){
+    public function IsoDateTime($id)
+    {
         $example = date("c");
         $prop = $this->String($id, $example);
         $prop["format"] = "date-time";
-        return $prop;       
+        return $prop;
     }
 
     public function NumberWithEnum($id, $enumList)
     {
         $min = min($enumList);
         $max = max($enumList);
-        $prop = $this->Number($id, [$min,$max]);
+        $prop = $this->Number($id, [$min, $max]);
         $prop["enum"] = $enumList;
         return $prop;
     }
@@ -220,7 +224,7 @@ class MedicisModels implements MedicisModels_i {
 
     public function Timezone($id = 'timezone')
     {
-        $enumList = \DateTimeZone::listIdentifiers(\DateTimeZone::ALL);
+        $enumList = Jack::Time()->timezonesList();
         return $this->StringWithEnum($id, $enumList);
     }
 
@@ -229,7 +233,7 @@ class MedicisModels implements MedicisModels_i {
         $enumList = $this->currenciesCodes;
         return $this->StringWithEnum($id, $enumList);
     }
-    
+
     public function LangCode($id = 'langCode')
     {
         $enumList = $this->langCodes;
@@ -244,11 +248,11 @@ class MedicisModels implements MedicisModels_i {
         return $prop;
     }
 
-    public function Number($id, $MinMax = [null,null])
+    public function Number($id, $MinMax = [null, null])
     {
         $prop = [];
         $prop['$id'] = "#/properties/" . $id;
-        $prop['title'] = $this->prcTitle($id);
+        $prop['title'] = Jack::Help()->UpCamelCase($id);
         $prop['type'] = 'number';
 
         if (is_int($MinMax[0])) {
@@ -268,7 +272,7 @@ class MedicisModels implements MedicisModels_i {
     public function ShortTitle($id = 'shortTitle')
     {
         $example = 'A Short Version of Title';
-        return $this->String($id, $example, [0,50]);
+        return $this->String($id, $example, [0, 50]);
     }
 
     public function Title($id = 'title')
@@ -280,7 +284,7 @@ class MedicisModels implements MedicisModels_i {
     public function Year($id = "year")
     {
         $example = date('Y');
-        return $this->String($id, $example, [4,4]);
+        return $this->String($id, $example, [4, 4]);
     }
 
     public function UniqueRef($id, $refKey, $idpattern = '[\w\-]{21}')
@@ -289,11 +293,11 @@ class MedicisModels implements MedicisModels_i {
         if ($refExists === false) {
             return ['err' => 'reference key not found: ' . $refKey];
         }
-        $foreignFileName = $refKey . '-data';
+        $foreignFileName = $refKey . '-exmpl';
         $escFilename = str_replace('-', '\-', $refKey);
         $prop = [];
         $prop['$id'] = "#/properties/" . $id;
-        $prop['title'] = $this->prcTitle($id);
+        $prop['title'] = Jack::Help()->UpCamelCase($id);
         $prop["type"] = 'object';
         $prop["additionalProperties"] = false;
 

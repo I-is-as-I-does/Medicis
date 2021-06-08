@@ -37,7 +37,7 @@ class MedicisGroup implements MedicisGroup_i
                 if (array_key_exists($subDir . '-bundle', $errlog)) {
                     continue;
                 }
-                if (!array_key_exists('err', $buildRslt) && !array_key_exists('todo', $buildRslt)) {
+                if (!array_key_exists('err', $buildRslt) && !array_key_exists('skipped', $buildRslt) && !array_key_exists('todo', $buildRslt)) {
                     $prc = $this->bundleContent($collcId, $subDir, $collcPaths['collcDistPaths']);
                     if (!array_key_exists('err', $prc)) {
                         $bundle[$subDir] = $prc;
@@ -46,7 +46,7 @@ class MedicisGroup implements MedicisGroup_i
                         $errlog[$subDir . '-bundle']['err'] = $prc['err'];
                     }
                 } else {
-                    foreach (['err', 'todo'] as $badK) {
+                    foreach (['err', 'todo', 'skipped'] as $badK) {
                         if (!empty($buildRslt[$badK])) {
                             $errlog[$subDir . '-bundle'][$badK] = $buildRslt[$badK];
                         }
@@ -60,10 +60,10 @@ class MedicisGroup implements MedicisGroup_i
         if (!empty($bundle)) {
             $jobs = ['config' => $groupInfos['groupSrcConfig'],
                 'transl' => $groupId];
-            foreach ($jobs as $jobK => $scdParam) {
+            foreach ($jobs as $jobK => $scdargm) {
                 if (!empty($bundle[$jobK])) {
                     $method = 'prcBundle' . ucfirst($jobK);
-                    $bundle[$jobK] = $this->$method($bundle[$jobK], $scdParam);
+                    $bundle[$jobK] = $this->$method($bundle[$jobK], $scdargm);
                     if (array_key_exists('err', $bundle[$jobK])) {
                         $errlog[$jobK . '-bundle']['err'] = $bundle[$jobK]['err'];
                         unset($bundle[$jobK]);
@@ -94,14 +94,14 @@ class MedicisGroup implements MedicisGroup_i
     {
         $groupNameTransl = $this->MetaMedicis->getMedicisMember('Transl')->groupTranslBuild($groupId);
         if (array_key_exists('err', $groupNameTransl)) {
-            return ['err' => implode(PHP_EOL,$groupNameTransl['err'])];
+            return ['err' => implode(PHP_EOL, $groupNameTransl['err'])];
         }
         if (array_key_exists('todo', $groupNameTransl)) {
-            return ['err' => implode(PHP_EOL,$groupNameTransl['todo'])];
+            return ['err' => implode(PHP_EOL, $groupNameTransl['todo'])];
         }
-      
+
         foreach ($groupNameTransl['success'] as $lang => $data) {
-            
+
             $bundleTransl[$lang][$groupId] = $data['name'][$groupId];
         }
 

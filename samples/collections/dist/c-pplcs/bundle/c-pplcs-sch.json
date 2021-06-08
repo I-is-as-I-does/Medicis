@@ -1,95 +1,92 @@
 {
-    "c-pplcs-contacts": {
-        "$schema": "http:\/\/json-schema.org\/draft-07\/schema",
-        "$id": "c-pplcs-contacts.json",
-        "title": "c-pplcs-contacts",
-        "type": "object",
-        "required": [
-            "label",
-            "name"
-        ],
-        "properties": {
-            "label": {
-                "$id": "#\/properties\/label",
-                "title": "label",
-                "type": "string",
-                "example": "Record Label"
+  "c-pplcs-contacts": {
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "c-pplcs-contacts.json",
+    "title": "c-pplcs-contacts",
+    "type": "object",
+    "required": ["label", "name"],
+    "properties": {
+      "label": {
+        "$id": "#/properties/label",
+        "title": "label",
+        "type": "string",
+        "example": "Record Label"
+      },
+      "name": {
+        "$id": "#/properties/name",
+        "title": "name",
+        "type": "string",
+        "example": "Nobody Bob"
+      },
+      "activities": {
+        "$id": "#/properties/activities",
+        "title": "activities",
+        "type": "array",
+        "uniqueItems": true,
+        "additionalItems": true,
+        "items": {
+          "$id": "#/properties/activities/items",
+          "title": "activitiesItems",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "relPointer": {
+              "$id": "#/properties/activities/items/relPointer",
+              "title": "activitiesItemsRelPointer",
+              "type": "string",
+              "example": "c-pplcs-activities-exmpl.json#/123e4567-e89b-12d3-a456-426614174000",
+              "pattern": "^c\\-pplcs\\-activities\\.json#/[\\w\\-]{21}\\$"
             },
-            "name": {
-                "$id": "#\/properties\/name",
-                "title": "name",
-                "type": "string",
-                "example": "Nobody Bob"
-            },
-            "activities": {
-                "$id": "#\/properties\/activities",
-                "title": "activities",
-                "type": "array",
-                "uniqueItems": true,
-                "additionalItems": true,
-                "items": {
-                    "$id": "#\/properties\/activities\/items",
-                    "title": "activitiesItems",
-                    "type": "object",
-                    "additionalProperties": false,
-                    "properties": {
-                        "relPointer": {
-                            "$id": "#\/properties\/activities\/items\/relPointer",
-                            "title": "activitiesItemsRelPointer",
-                            "type": "string",
-                            "example": "c-pplcs-activities-data.json#\/123e4567-e89b-12d3-a456-426614174000",
-                            "pattern": "^c\\-pplcs\\-activities\\.json#\/[\\w\\-]{21}\\$"
-                        },
-                        "relLabel": {
-                            "$id": "#\/properties\/activities\/items\/relLabel",
-                            "title": "activitiesItemsRelLabel",
-                            "type": "string",
-                            "example": "Related Item Label"
-                        }
-                    }
-                }
-            },
-            "emails": {
-                "$id": "#\/properties\/emails",
-                "title": "emails",
-                "type": "array",
-                "uniqueItems": true,
-                "additionalItems": true,
-                "items": {
-                    "$id": "#\/properties\/emails\/items",
-                    "title": "emailsItems",
-                    "type": "string",
-                    "example": "some.name@domain.xyz",
-                    "format": "email"
-                }
-            },
-            "addresses": {
-                "$id": "#\/properties\/addresses",
-                "title": "addresses",
-                "type": "array",
-                "uniqueItems": true,
-                "additionalItems": true,
-                "items": {
-                    "$id": "#\/properties\/addresses\/items",
-                    "title": "addressesItems",
-                    "type": "string",
-                    "example": "10 NowhereStreet, SomeCity (us)"
-                }
-            },
-            "websites": {
-                "$id": "#\/properties\/websites",
-                "title": "websites",
-                "type": "array",
-                "uniqueItems": true,
-                "additionalItems": true,
-                "items": {
-                    "$id": "#\/properties\/websites\/items",
-                    "title": "websitesItems",
-                    "type": "string",
-                    "example": "http:\/\/someone-website.xyz"
-                }
+            "relLabel": {
+              "$id": "#/properties/activities/items/relLabel",
+              "title": "activitiesItemsRelLabel",
+              "type": "string",
+              "example": "Related Item Label"
             }
-        },
-        "additionalProperties": false
-    }
+          }
+        }
+      },
+      "emails": {
+        "$id": "#/properties/emails",
+        "title": "emails",
+        "type": "array",
+        "uniqueItems": true,
+        "additionalItems": true,
+        "items": {
+          "$id": "#/properties/emails/items",
+          "title": "emailsItems",
+          "type": "string",
+          "example": "some.name@domain.xyz",
+          "format": "email"
+        }
+      },
+      "addresses": {
+        "$id": "#/properties/addresses",
+        "title": "addresses",
+        "type": "array",
+        "uniqueItems": true,
+        "additionalItems": true,
+        "items": {
+          "$id": "#/properties/addresses/items",
+          "title": "addressesItems",
+          "type": "string",
+          "example": "10 NowhereStreet, SomeCity (us)"
+        }
+      },
+      "websites": {
+        "$id": "#/properties/websites",
+        "title": "websites",
+        "type": "array",
+        "uniqueItems": true,
+        "additionalItems": true,
+        "items": {
+          "$id": "#/properties/websites/items",
+          "title": "websitesItems",
+          "type": "string",
+          "example": "http://someone-website.xyz"
+        }
+      }
+    },
+    "additionalProperties": false
+  }
 }

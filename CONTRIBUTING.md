@@ -115,9 +115,9 @@ Each collection file must specify 4 main properties:
 `props` items are objects, each containing 2 properties:
 
 - `method` | _string_
-- and `param` | _array_
+- and `argm` | _array_
 
-The shortcut is within `method` and `param`: they refer to methods in _MedicisModels_ that will do the heavy work.
+The shortcut is within `method` and `argm`: they refer to methods in _MedicisModels_ that will do the heavy work.
 
 _Example:_
 `c-pplcs-activities.json`:
@@ -130,7 +130,7 @@ _Example:_
   "props": [
     {
       "method": "String",
-      "param": ["activity", "Art historian"]
+      "argm": ["activity", "Art historian"]
     }
   ]
 }

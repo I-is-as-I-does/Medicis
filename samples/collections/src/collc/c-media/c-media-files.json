@@ -1,26 +1,24 @@
 {
-    "required": ["label", "path"],
-    "props": [
-      {
-        "method": "Label",
-        "param": []
-      },
-      {
-        "method": "Path",
-        "param": []
-      },
-      {
-        "method": "UniqueRef",
-        "param": ["credits", "c-pplcs-contacts"]
-      }
-    ],
-    "config":
+  "required": ["label", "path"],
+  "props": [
     {
-      "userEditable":["priority","auth"],
-      "priority":1,
-      "status": "required",
-      "auth": 1,
-      "template": "files"
+      "method": "Label",
+      "argm": []
+    },
+    {
+      "method": "Path",
+      "argm": []
+    },
+    {
+      "method": "UniqueRef",
+      "argm": ["credits", "c-pplcs-contacts"]
+    }
+  ],
+  "config": {
+    "userEditable": ["priority", "auth"],
+    "priority": 1,
+    "status": "required",
+    "auth": 1,
+    "template": "files"
   }
-  }
-  
+}

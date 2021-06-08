@@ -8,7 +8,7 @@ class MedicisMap implements MedicisMap_i
 
     private $collectionDirPath;
 
-    private $dirStructure = ['config', 'data', 'sch', 'transl'];
+    private $dirStructure = ['config', 'exmpl', 'sch', 'transl'];
 
     private $dirMap = [];
     private $collcIndex = [];

@@ -3,19 +3,18 @@
   "props": [
     {
       "method": "Label",
-      "param": []
+      "argm": []
     },
     {
       "method": "String",
-      "param": ["activity", "Art historian"]
+      "argm": ["activity", "Art historian"]
     }
   ],
-  "config":
-  {
-    "userEditable":["priority","auth"],
-    "priority":2,
+  "config": {
+    "userEditable": ["priority", "auth"],
+    "priority": 2,
     "status": "required",
     "auth": 1,
     "template": "collections"
-}
+  }
 }

@@ -3,35 +3,34 @@
   "props": [
     {
       "method": "Label",
-      "param": []
+      "argm": []
     },
     {
       "method": "String",
-      "param": ["name","Nobody Bob"]
+      "argm": ["name", "Nobody Bob"]
     },
     {
       "method": "RefsArray",
-      "param": ["activities", "c-pplcs-activities"]
+      "argm": ["activities", "c-pplcs-activities"]
     },
     {
       "method": "EmailsArray",
-      "param": ["emails"]
+      "argm": ["emails"]
     },
     {
       "method": "StringsArray",
-      "param": ["addresses","10 NowhereStreet, SomeCity (us)"]
+      "argm": ["addresses", "10 NowhereStreet, SomeCity (us)"]
     },
     {
       "method": "StringsArray",
-      "param": ["websites","http://someone-website.xyz"]
+      "argm": ["websites", "http://someone-website.xyz"]
     }
   ],
-  "config":
-  {
-    "userEditable":["priority","auth"],
-    "priority":1,
+  "config": {
+    "userEditable": ["priority", "auth"],
+    "priority": 1,
     "status": "required",
     "auth": 1,
     "template": "collections"
-}
+  }
 }

@@ -26,7 +26,7 @@ class MedicisCollc implements MedicisCollc_i
         $rslt = [];
         $rslt['sch'] = $this->MetaMedicis->saveDistFile($sch, $collcId, 'sch');
         if (!array_key_exists('err', $rslt['sch'])) {
-            $rslt['data'] = $this->dummyDataBuild($collcId, $sch);
+            $rslt['exmpl'] = $this->dummyDataBuild($collcId, $sch);
             $rslt['config'] = $this->collcConfigBuild($collcId, $src);
             if ($translToo === true) {
                 $rslt['transl'] = $this->MetaMedicis->getMedicisMember('Transl')->collcTranslBuild($collcId, $sch);
@@ -48,19 +48,39 @@ class MedicisCollc implements MedicisCollc_i
         return ['skipped' => 'No config found in "' . $collcId . '" source file'];
     }
 
-    public function iterateOnSchProps($props, $targ)
+    public function iterateOnSchProps($sch, $targ, $defs =[])
     {
-        $data = [];
-        foreach ($props as $k => $v) {
-            if ($v['type'] == 'object') {
-                $data[$k] = $this->iterateOnSchProps($v['properties'], $targ);
-            } else {
-                if (array_key_exists($targ, $v)) {
-                    $data[$k] = $v[$targ];
-                }
+
+        if (array_key_exists($targ, $sch)) {
+            return $sch[$targ];
+        }
+
+        if(empty($defs) && array_key_exists('definitions',$sch)){
+            $defs = $sch["definitions"];
+        }
+        if (array_key_exists('$ref', $sch) && !empty($defs)) {
+            $spltid = explode('/', $sch['$ref']);
+            $refid = array_pop($spltid);
+            if (!empty($defs[$refid])) {
+                return $this->iterateOnSchProps($defs[$refid], $targ, $defs);
             }
         }
-        return $data;
+
+        if (!empty($sch['items'])) {
+            return $this->iterateOnSchProps($sch['items'], $targ, $defs);
+        }
+
+        if (!empty($sch['properties'])) {
+            $data = [];
+            
+            foreach ($sch['properties'] as $k => $v) {
+                $itr = $this->iterateOnSchProps($v, $targ, $defs);
+                if (!empty($itr)) {
+                    $data[$k] = $itr;
+                }
+            }
+            return $data;
+        }
     }
 
     public function dummyDataBuild($collcId, $sch = [])
@@ -69,8 +89,8 @@ class MedicisCollc implements MedicisCollc_i
         if (array_key_exists('err', $sch)) {
             return $sch;
         }
-        $dummyData = $this->iterateOnSchProps($sch['properties'], 'example');
-        return $this->MetaMedicis->saveDistFile($dummyData, $collcId, 'data');
+        $dummyData = $this->iterateOnSchProps($sch, 'example');
+        return $this->MetaMedicis->saveDistFile($dummyData, $collcId, 'exmpl');
     }
 
 }

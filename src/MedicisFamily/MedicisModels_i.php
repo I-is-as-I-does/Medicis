@@ -1,11 +1,12 @@
 <?php
-/* This file is part of Medicis | SSITU | (c) 2021 I-is-as-I-does | MIT License */
-
+/* This file is part of Medicis | SSITU | (c) 2021 I-is-as-I-does | MIT License */
 namespace SSITU\Medicis\MedicisFamily;
 interface MedicisModels_i {
-public function __construct($MetaMedicis, $idpattern = '');
+public function __construct($MetaMedicis);
 public function baseArray($id, $arrMinMax = array (0 => NULL,
   1 => NULL,), $unique = true);
+public function ObjectsArray($id, $subSchemaId, $adtProp = false, $arrMinMax = array (0 => NULL,
+  1 => NULL,));
 public function EmailsArray($id, $arrMinMax = array (0 => NULL,
   1 => NULL,));
 public function RefsArray($id, $refKey, $arrMinMax = array (0 => NULL,
@@ -19,7 +20,7 @@ public function NumbersArray($id, $MinMax = array (0 => NULL,
   1 => NULL,), $arrMinMax = array (0 => NULL,
   1 => NULL,), $unique = false);
 public function Label($id = 'label');
-public function NanoId($id = 'id', $pattern = '[\w\-]{21}');
+public function NanoId($id = 'id', $pattern = '[\\w\\-]{21}');
 public function Bool($id, $default = NULL);
 public function Email($id);
 public function String($id, $example, $lenMinMax = array (0 => NULL,
@@ -38,5 +39,5 @@ public function Number($id, $MinMax = array (0 => NULL,
 public function ShortTitle($id = 'shortTitle');
 public function Title($id = 'title');
 public function Year($id = 'year');
-public function UniqueRef($id, $refKey, $idpattern = '[\w\-]{21}');
+public function UniqueRef($id, $refKey, $idpattern = '[\\w\\-]{21}');
 }

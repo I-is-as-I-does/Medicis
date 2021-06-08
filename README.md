@@ -85,9 +85,9 @@ Each collection file must specify 2 main properties:
 `props` items are objects, each containing 2 properties:
 
 - `method` | _string_
-- and `param` | _array_
+- and `argm` | _array_
 
-The shortcut is within `method` and `param`: they refer to methods in _MedicisModels_ that will do the heavy work.
+The shortcut is within `method` and `argm`: they refer to methods in _MedicisModels_ that will do the heavy work.
 
 _Example:_
 `people-activities.json`:
@@ -98,7 +98,7 @@ _Example:_
   "props": [
     {
       "method": "String",
-      "param": ["activity", "Art historian"]
+      "argm": ["activity", "Art historian"]
     }
   ]
 }
@@ -177,7 +177,7 @@ To generate from there a real schema, dummy data, translation arrays, and option
 - then `'people-activities -> all'`
 
 You'll get a log of what worked, failed, have been skipped, etc, and you'll find generated files in `dist/people/` folders:  
-`sch`, `data`, `config` and `transl`.
+`sch`, `exmpl`, `config` and `transl`.
 
 ### Merge
 
