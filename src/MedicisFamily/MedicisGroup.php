@@ -3,6 +3,9 @@
 
 namespace SSITU\Medicis\MedicisFamily;
 
+use SSITU\Jack\Jack;
+
+
 class MedicisGroup implements MedicisGroup_i
 {
     private $MetaMedicis;
@@ -39,10 +42,7 @@ class MedicisGroup implements MedicisGroup_i
                 if(!array_key_exists($subDir,$bundle)){
                     $bundle[$subDir]= [];
                 }
-                if (array_key_exists($subDir . '-bundle', $errlog)) {
-                    continue;
-                }
-                if (!array_key_exists('err', $buildRslt) && !array_key_exists('skipped', $buildRslt) && !array_key_exists('todo', $buildRslt)) {
+                if (!array_key_exists($subDir . '-bundle', $errlog) && !array_key_exists('err', $buildRslt) && !array_key_exists('skipped', $buildRslt) && !array_key_exists('todo', $buildRslt)) {
                     $prc = $this->bundleContent($collcId, $subDir, $collcPaths['collcDistPaths']);
                     if (!array_key_exists('err', $prc)) {
                         $bundle[$subDir] = array_merge_recursive($bundle[$subDir],$prc);
@@ -85,12 +85,9 @@ class MedicisGroup implements MedicisGroup_i
     {
         if (!empty($errlog)) {
             foreach ($errlog as $bundleK => $errdata) {
-                $errk = array_key_first($errdata);
-                $errc = $errdata[$errk];
-                if (is_array($errc)) {
-                    $errc = implode(PHP_EOL, $errc);
-                }
-                $bundleRslt[$bundleK][$errk] = $errc;
+               $flat = Jack::Arrays()->flatten($errdata);
+               $k = trim(str_replace([0,1,2,3,4,5,6,7,8,9],'',array_key_first($flat)),'.');
+               $bundleRslt[$bundleK][$k] = PHP_EOL.implode(PHP_EOL,$flat);
             }
         }
         return $bundleRslt;

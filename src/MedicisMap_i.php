@@ -5,7 +5,7 @@ namespace SSITU\Medicis;
 
 interface MedicisMap_i
 {
-    public function __construct($collectionDirPath,,$abslURIBase = null);
+    public function __construct($collectionDirPath,$abslURIBase = null);
     public function getSchAbslId($collcId);
     public function getLog();
     public function getCollcMap();

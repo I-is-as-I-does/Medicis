@@ -58,7 +58,7 @@ class MedicisSchema implements MedicisSchema_i {
         //removed: '$id' => $collcId . '.json' (an aboslute uri is required, yet any change would make a mess...)
         return [
             '$schema' => "http://json-schema.org/draft-07/schema",
-            '$id' => $this->MedicisMap->getSchAbslId($collcId);
+            '$id' => $this->MedicisMap->getSchAbslId($collcId),
             'title' => $collcId,
         ];
     }

@@ -73,6 +73,7 @@ class MedicisTransl implements MedicisTransl_i
             }
             if (!empty($rslt['todo'][$lang])) {
                 $rslt['todo'][$lang] = implode("; ", $rslt['todo'][$lang]);
+
                 if ($saveFile) {
                     $save = Jack::File()->saveJson($content, $path, true);
                     if (array_key_exists('err', $save)) {
