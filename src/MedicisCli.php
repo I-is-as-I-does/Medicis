@@ -22,10 +22,10 @@ class MedicisCli
     private $groupCallMap;
     private $collcCallMap;
 
-    public function __construct($collectionDirPath, $runBuild = false)
+    public function __construct($collectionDirPath, $abslURIBase= null, $runBuild = false)
     {
         $this->Companion = EuclidCompanion::inst();
-        $this->MedicisMap = new MedicisMap($collectionDirPath);
+        $this->MedicisMap = new MedicisMap($collectionDirPath,$abslURIBase);
         $log = $this->MedicisMap->getLog();
         if (!empty($log['err'])) {
             $this->Companion::output($log);

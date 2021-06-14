@@ -9,11 +9,13 @@ class MedicisSchema implements MedicisSchema_i {
 
     private $MetaMedicis;
     private $MedicisModels;
+    private $MedicisMap;
 
     public function __construct($MetaMedicis)
     {
         $this->MetaMedicis = $MetaMedicis;
         $this->MedicisModels = $MetaMedicis->getMedicisMember('Models');
+        $this->MedicisMap =  $MetaMedicis->getMedicisMap();
     }
 
     public function schBuild($collcId, $src = [])
@@ -53,9 +55,10 @@ class MedicisSchema implements MedicisSchema_i {
 
     private function schWrap($collcId)
     {
+        //removed: '$id' => $collcId . '.json' (an aboslute uri is required, yet any change would make a mess...)
         return [
             '$schema' => "http://json-schema.org/draft-07/schema",
-            '$id' => $collcId . '.json',
+            '$id' => $this->MedicisMap->getSchAbslId($collcId);
             'title' => $collcId,
         ];
     }

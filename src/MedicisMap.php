@@ -3,9 +3,13 @@
 
 namespace SSITU\Medicis;
 
+use SSITU\Jack\Jack;
+
+
 class MedicisMap implements MedicisMap_i
 {
 
+    private $abslURIBase;
     private $collectionDirPath;
 
     private $dirStructure = ['config', 'exmpl', 'sch', 'transl'];
@@ -20,8 +24,12 @@ class MedicisMap implements MedicisMap_i
 
     private $init = false;
 
-    public function __construct($collectionDirPath)
+    public function __construct($collectionDirPath,$abslURIBase = null)
     {
+        if(empty($abslURIBase)){
+            $abslURIBase = Jack::Web()->getProtocol().'://'.$_SERVER['HTTP_HOST'].'/sch';
+        }
+        $this->abslURIBase = Jack::File()->reqTrailingSlash($abslURIBase);
         if (!is_dir($collectionDirPath)) {
             mkdir($base, 0777, true);
             $this->log['done'][] = 'created dir. ' . basename($collectionDirPath);
@@ -36,6 +44,11 @@ class MedicisMap implements MedicisMap_i
                 return $this->log;
             }
         }
+    }
+
+    public function getSchAbslId($collcId)
+    {
+       return $this->abslURIBase.$collcId.'.json';
     }
 
     private function buildCollcMap()

@@ -25,6 +25,7 @@ class MedicisGroup implements MedicisGroup_i
         $errlog = [];
 
         $bundle = [];
+
         foreach ($groupCollcs as $collcId => $collcPaths) {
 
             $collcBuild = $this->MetaMedicis->getMedicisMember('Collc')->collcBuild($collcId, $translToo);
@@ -33,22 +34,26 @@ class MedicisGroup implements MedicisGroup_i
                 $bundle = [];
                 break;
             }
+            
             foreach ($collcBuild as $subDir => $buildRslt) {
+                if(!array_key_exists($subDir,$bundle)){
+                    $bundle[$subDir]= [];
+                }
                 if (array_key_exists($subDir . '-bundle', $errlog)) {
                     continue;
                 }
                 if (!array_key_exists('err', $buildRslt) && !array_key_exists('skipped', $buildRslt) && !array_key_exists('todo', $buildRslt)) {
                     $prc = $this->bundleContent($collcId, $subDir, $collcPaths['collcDistPaths']);
                     if (!array_key_exists('err', $prc)) {
-                        $bundle[$subDir] = $prc;
+                        $bundle[$subDir] = array_merge_recursive($bundle[$subDir],$prc);
                         continue;
                     } else {
-                        $errlog[$subDir . '-bundle']['err'] = $prc['err'];
+                        $errlog[$subDir . '-bundle']['err'][] = $prc['err'];
                     }
                 } else {
                     foreach (['err', 'todo', 'skipped'] as $badK) {
                         if (!empty($buildRslt[$badK])) {
-                            $errlog[$subDir . '-bundle'][$badK] = $buildRslt[$badK];
+                            $errlog[$subDir . '-bundle'][$badK][] = $buildRslt[$badK];
                         }
                     }
                 }
@@ -65,7 +70,7 @@ class MedicisGroup implements MedicisGroup_i
                     $method = 'prcBundle' . ucfirst($jobK);
                     $bundle[$jobK] = $this->$method($bundle[$jobK], $scdargm);
                     if (array_key_exists('err', $bundle[$jobK])) {
-                        $errlog[$jobK . '-bundle']['err'] = $bundle[$jobK]['err'];
+                        $errlog[$jobK . '-bundle']['err'][] = $bundle[$jobK]['err'];
                         unset($bundle[$jobK]);
                     }
                 }
@@ -93,6 +98,7 @@ class MedicisGroup implements MedicisGroup_i
     private function prcBundleTransl($bundleTransl, $groupId)
     {
         $groupNameTransl = $this->MetaMedicis->getMedicisMember('Transl')->groupTranslBuild($groupId);
+       
         if (array_key_exists('err', $groupNameTransl)) {
             return ['err' => implode(PHP_EOL, $groupNameTransl['err'])];
         }
