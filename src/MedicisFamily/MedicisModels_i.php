@@ -1,11 +1,13 @@
 <?php
-/* This file is part of Medicis | SSITU | (c) 2021 I-is-as-I-does | MIT License */
+/* This file is part of Medicis | SSITU | (c) 2021 I-is-as-I-does | MIT License */
+
 namespace SSITU\Medicis\MedicisFamily;
 interface MedicisModels_i {
 public function __construct($MetaMedicis);
 public function baseArray($id, $arrMinMax = array (0 => NULL,
   1 => NULL,), $unique = true);
-public function ObjectsArray($id, $subSchemaId, $adtProp = false, $arrMinMax = array (0 => NULL,
+public function SubObject($id, $subSchemaId, $adtProp = false);
+public function ObjectsArray($id, $subSchemaId, $arrMinMax = array (0 => NULL,
   1 => NULL,));
 public function EmailsArray($id, $arrMinMax = array (0 => NULL,
   1 => NULL,));

@@ -80,7 +80,18 @@ class MedicisModels implements MedicisModels_i {
         return $prop;
     }
 
-    public function ObjectsArray($id, $subSchemaId, $adtProp = false, $arrMinMax = [null, null])
+    public function SubObject($id, $subSchemaId, $adtProp = false)
+    {
+        $prop = [];
+        $prop['$id'] = "#/properties/" . $id;
+        $prop['title'] = Jack::Help()->UpCamelCase($id);
+        $prop['type'] = 'object';
+        $prop['additionalProperties'] =$adtProp;
+        $prop["properties"] = [ '$ref'=> "#/definitions/".$subSchemaId ];
+        return $prop;
+    }
+
+    public function ObjectsArray($id, $subSchemaId, $arrMinMax = [null, null])
     {
         $prop = $this->baseArray($id, $arrMinMax);
         $prop["items"] = [ '$ref'=> "#/definitions/".$subSchemaId ];
