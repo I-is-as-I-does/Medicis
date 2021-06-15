@@ -69,7 +69,12 @@ class MedicisModels implements MedicisModels_i {
 
     private function fillArrayExample($prop, $arrMinMax)
     {
-        $exmpl = $prop["items"]['example'];
+        if(!empty($prop["items"]['properties'])){
+            $exmpl = array_column($prop["items"]['properties'],'example');
+        } else {
+            $exmpl = $prop["items"]['example'];
+        }
+        
         $prop["example"][] = $exmpl;
         if ($arrMinMax[0] > 1) {
 
@@ -87,7 +92,7 @@ class MedicisModels implements MedicisModels_i {
         $prop['title'] = Jack::Help()->UpCamelCase($id);
         $prop['type'] = 'object';
         $prop['additionalProperties'] =$adtProp;
-        $prop["properties"] = [ '$ref'=> "#/definitions/".$subSchemaId ];
+        $prop['$ref'] = "#/definitions/".$subSchemaId;
         return $prop;
     }
 
@@ -110,6 +115,7 @@ class MedicisModels implements MedicisModels_i {
     {
         $prop = $this->baseArray($id, $arrMinMax);
         $prop["items"] = $this->UniqueRef($id . '/items', $refKey);
+       
         return $this->fillArrayExample($prop, $arrMinMax);
     }
 
@@ -315,12 +321,18 @@ class MedicisModels implements MedicisModels_i {
         $pointerId = 'relPointer';
         $pointerExample = $foreignFileName . '.json#/123e4567-e89b-12d3-a456-426614174000';
         $pointerPattern = '^' . $escFilename . '\.json#/' . $idpattern . '\$';
-        $prop["properties"][$pointerId] = $this->String($id . '/' . $pointerId, $pointerExample, false, false, $pointerPattern);
+        $prop["properties"][$pointerId] = $this->String($id . '/' . $pointerId, $pointerExample, [null, null], $pointerPattern);
 
         $labelId = 'relLabel';
         $labelExample = 'Related Item Label';
         $prop["properties"][$labelId] = $this->String($id . '/' . $labelId, $labelExample);
 
+        return $prop;
+    }
+
+    public function StrongPassword($id, $pattern = '^(?=\\S*?[A-Z])(?=\\S*?[a-z])(?=\\S*?[0-9])(?=\\S*?[*&!@%^#$]).{8,}$'){
+        $example = 'o9#&5w&2$@EL87n3512MqXcg9Ln%^#v0';
+        $prop = $this->String($id, $example, [null, null], $pattern);
         return $prop;
     }
 }

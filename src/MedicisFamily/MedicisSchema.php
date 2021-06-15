@@ -100,7 +100,7 @@ class MedicisSchema implements MedicisSchema_i {
                 return ['err' => 'method "' . $method . '" does not exist in MedicisModels'];
             }
             $build["props"][$id] = $this->MedicisModels->$method(...$argm);
-            if ($method === 'ObjectsArray') {
+            if (in_array($method,['ObjectsArray','SubObject'])) {
                 $subPrc = $this->prcSubProperties($src, $build['defs'], $id, $argm);
                 if (array_key_exists('err', $subPrc)) {
                     return $subPrc;

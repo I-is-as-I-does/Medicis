@@ -75,19 +75,30 @@ class MedicisGroup implements MedicisGroup_i
                     }
                 }
             }
-            $bundleRslt = $this->createBundleFiles($groupId, $bundle);
         }
+        $bundleRslt = $this->createBundleFiles($groupId, $bundle);
 
         return $this->mergeRslt($bundleRslt, $errlog);
     }
 
     private function mergeRslt($bundleRslt, $errlog)
     {
-        if (!empty($errlog)) {
-            foreach ($errlog as $bundleK => $errdata) {
+if (!empty($errlog)) {
+    
+           foreach ($errlog as $bundleK => $errdata) {
+            //$bundleRslt[$bundleK][] = $errdata;
+
                $flat = Jack::Arrays()->flatten($errdata);
-               $k = trim(str_replace([0,1,2,3,4,5,6,7,8,9],'',array_key_first($flat)),'.');
-               $bundleRslt[$bundleK][$k] = PHP_EOL.implode(PHP_EOL,$flat);
+               $pile = [];
+               foreach($flat as $fk => $fdata){
+                    $k = trim(str_replace([0,1,2,3,4,5,6,7,8,9],'',$fk),'.');
+                    $pile[$k][] = $fdata;
+               }
+               foreach($pile as $kpile => $dpile){
+                $bundleRslt[$bundleK][$kpile] = PHP_EOL.implode(PHP_EOL,$dpile);
+               }
+               
+             
             }
         }
         return $bundleRslt;

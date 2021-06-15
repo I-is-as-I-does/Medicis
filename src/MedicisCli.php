@@ -16,8 +16,8 @@ class MedicisCli
     private $callableMap;
     private $backToMain = [',' => 'Main Menu' . PHP_EOL];
     private $mainMenu = [1 => 'Collc', 2 => "Group"];
-    private $groupOpts = ["all", 'transl'];
-    private $collcOpts = ['all', 'transl'];
+    private $groupOpts = ["all", 'transl-only', 'no-transl'];
+    private $collcOpts = ['all', 'transl-only', 'no-transl'];
     private $divider = ' -> ';
     private $groupCallMap;
     private $collcCallMap;
@@ -97,8 +97,9 @@ class MedicisCli
         $split = explode($this->divider, $request);
         $Id = $split[0];
         $opt = $split[1];
-        if ($opt === 'transl') {
-            $member = ucfirst($opt);
+        $argm = [$Id];
+        if ($opt === 'transl-only') {
+            $member = 'Transl';
             if ($this->currentMenu == 1) {
                 $method = 'collcTranslBuild';
             } else {
@@ -107,8 +108,11 @@ class MedicisCli
         } else {
             $member = $this->mainMenu[$this->currentMenu];
             $method = strtolower($member) . 'Build';
+            if ($opt === 'no-transl') {
+                $argm[] = false;
+            }
         }
-        $build = $this->MetaMedicis->getMedicisMember($member)->$method($Id);
+        $build = $this->MetaMedicis->getMedicisMember($member)->$method(...$argm);
         $requestk = $this->Companion->printRslt($build);
         $this->handleCmd($requestk);
     }

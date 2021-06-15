@@ -42,4 +42,6 @@ public function ShortTitle($id = 'shortTitle');
 public function Title($id = 'title');
 public function Year($id = 'year');
 public function UniqueRef($id, $refKey, $idpattern = '[\\w\\-]{21}');
+public function StrongPassword($id, $pattern = '^(?=\\S*?[A-Z])(?=\\S*?[a-z])(?=\\S*?[0-9])(?=\\S*?[*&!@%^#$]).{8,}$');
+
 }

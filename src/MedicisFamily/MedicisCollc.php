@@ -71,10 +71,15 @@ class MedicisCollc implements MedicisCollc_i
         }
 
         if (!empty($sch['properties'])) {
+         
             $data = [];
             
             foreach ($sch['properties'] as $k => $v) {
+                if($k == '$ref'){
+                    $itr = $this->iterateOnSchProps(['$ref'=>$v], $targ, $defs);
+                } else {
                 $itr = $this->iterateOnSchProps($v, $targ, $defs);
+            }
                 if (!empty($itr)) {
                     $data[$k] = $itr;
                 }

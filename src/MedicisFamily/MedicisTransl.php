@@ -64,7 +64,7 @@ class MedicisTransl implements MedicisTransl_i
                         $content[$trslKey][$itemId] = '';
                         $saveFile = true;
                     }
-                    if (!empty($content[$trslKey][$itemId])) {
+                    if (strlen($content[$trslKey][$itemId]) > 0) {
                         $doneStock[$trslKey][$itemId] = $content[$trslKey][$itemId];
                     } else {
                         $rslt['todo'][$lang][] = $itemId;
