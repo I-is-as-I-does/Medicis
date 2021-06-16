@@ -5,7 +5,8 @@ namespace SSITU\Medicis\MedicisFamily;
 
 use SSITU\Jack\Jack;
 
-class MedicisModels implements MedicisModels_i {
+class MedicisModels implements MedicisModels_i
+{
     private $MedicisMap;
 
     public $currenciesCodes = ["AFN", "ARS", "AWG", "AUD", "AZN", "BSD", "BBD", "BDT", "BYN", "BZD", "BMD", "BOP", "BAM", "BWP", "BGN", "BRL", "BND", "KHR", "CAD", "KYD", "CLP", "CNY", "COP", "CRC", "HRK", "CUP", "CZK", "DKK", "DOP", "XCD", "EGP", "SVC", "EEK", "EUR", "FKP", "FJD", "GHC", "GIP", "GTQ", "GGP", "GYD", "HNL", "HKD", "HUF", "ISK", "INR", "IDR", "IRR", "IMP", "ILS", "JMD", "JPY", "JEP", "KZT", "KPW", "KGS", "LAK", "LVL", "LBP", "LRD", "LTL", "MKD", "MYR", "MUR", "MXN", "MNT", "MZN", "NAD", "NPR", "ANG", "NZD", "NIO", "NGN", "NOK", "OMR", "PKR", "PAB", "PYG", "PEN", "PHP", "PLN", "QAR", "RON", "RUB", "SHP", "SAR", "RSD", "SCR", "SGD", "SBD", "SOS", "ZAR", "LKR", "SEK", "CHF", "SRD", "SYP", "TWD", "THB", "TTD", "TRY", "TVD", "UAH", "GBP", "UGX", "USD", "UYU", "UZS", "VEF", "VND", "ZWD",
@@ -18,7 +19,6 @@ class MedicisModels implements MedicisModels_i {
         $this->MedicisMap = $MetaMedicis->getMedicisMap();
 
     }
-
 
     public function baseArray($id, $arrMinMax = [null, null], $unique = true)
     {
@@ -67,14 +67,27 @@ class MedicisModels implements MedicisModels_i {
         return $prop;
     }
 
+    private function getArrayExample($prop)
+    {
+        if (!empty($prop["example"])) {
+            return $prop["example"];
+        }
+        if (!empty($prop["items"])) {
+            return $this->getArrayExample($prop["items"]);
+        }
+        if (!empty($prop["properties"])) {
+            $pile = [];
+            foreach ($prop["properties"] as $objprop) {
+                $pile[] = $this->getArrayExample($objprop);
+            }
+            return $pile;
+        }
+        return '';
+    }
+
     private function fillArrayExample($prop, $arrMinMax)
     {
-        if(!empty($prop["items"]['properties'])){
-            $exmpl = array_column($prop["items"]['properties'],'example');
-        } else {
-            $exmpl = $prop["items"]['example'];
-        }
-        
+        $exmpl = $this->getArrayExample($prop);
         $prop["example"][] = $exmpl;
         if ($arrMinMax[0] > 1) {
 
@@ -91,15 +104,15 @@ class MedicisModels implements MedicisModels_i {
         $prop['$id'] = "#/properties/" . $id;
         $prop['title'] = Jack::Help()->UpCamelCase($id);
         $prop['type'] = 'object';
-        $prop['additionalProperties'] =$adtProp;
-        $prop['$ref'] = "#/definitions/".$subSchemaId;
+        $prop['additionalProperties'] = $adtProp;
+        $prop['$ref'] = "#/definitions/" . $subSchemaId;
         return $prop;
     }
 
     public function ObjectsArray($id, $subSchemaId, $arrMinMax = [null, null])
     {
         $prop = $this->baseArray($id, $arrMinMax);
-        $prop["items"] = [ '$ref'=> "#/definitions/".$subSchemaId ];
+        $prop["items"] = ['$ref' => "#/definitions/" . $subSchemaId];
         return $prop;
     }
 
@@ -115,7 +128,10 @@ class MedicisModels implements MedicisModels_i {
     {
         $prop = $this->baseArray($id, $arrMinMax);
         $prop["items"] = $this->UniqueRef($id . '/items', $refKey);
-       
+        if (array_key_exists('err',$prop["items"])) {
+            return $prop["items"];
+        }
+
         return $this->fillArrayExample($prop, $arrMinMax);
     }
 
@@ -330,7 +346,8 @@ class MedicisModels implements MedicisModels_i {
         return $prop;
     }
 
-    public function StrongPassword($id, $pattern = '^(?=\\S*?[A-Z])(?=\\S*?[a-z])(?=\\S*?[0-9])(?=\\S*?[*&!@%^#$]).{8,}$'){
+    public function StrongPassword($id, $pattern = '^(?=\\S*?[A-Z])(?=\\S*?[a-z])(?=\\S*?[0-9])(?=\\S*?[*&!@%^#$]).{8,}$')
+    {
         $example = 'o9#&5w&2$@EL87n3512MqXcg9Ln%^#v0';
         $prop = $this->String($id, $example, [null, null], $pattern);
         return $prop;
