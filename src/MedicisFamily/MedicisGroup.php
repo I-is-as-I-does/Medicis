@@ -63,7 +63,7 @@ class MedicisGroup implements MedicisGroup_i
         }
 
         if (!empty($bundle)) {
-            $jobs = ['config' => $groupInfos['groupSrcConfig'],
+            $jobs = [
                 'transl' => $groupId];
             foreach ($jobs as $jobK => $scdargm) {
                 if (!empty($bundle[$jobK])) {
@@ -122,13 +122,6 @@ if (!empty($errlog)) {
         return $bundleTransl;
     }
 
-    private function prcBundleConfig($bundleConfig, $groupSrcConfig)
-    {
-        if (file_exists($groupSrcConfig)) {
-            return $this->groupConfig($bundleConfig, $groupSrcConfig);
-        }
-        return $bundleConfig;
-    }
 
     private function bundleContent($collcId, $subDir, $collcDistPaths)
     {
@@ -148,18 +141,6 @@ if (!empty($errlog)) {
             $stock[$lang][$collcId] = $content;
         }
         return $stock;
-    }
-
-    private function groupConfig($bundleConfig, $groupConfigPath)
-    {
-
-        $groupConfig = $this->MetaMedicis->getCollcFile($groupConfigPath);
-        if (!array_key_exists('err', $groupConfig)) {
-            $groupConfig['config']["items"] = $bundleConfig;
-            return $groupConfig['config'];
-        }
-
-        return $groupConfig;
     }
 
     private function createBundleFiles($groupId, $bundle)

@@ -12,7 +12,7 @@ class MedicisMap implements MedicisMap_i
     private $abslURIBase;
     private $collectionDirPath;
 
-    private $dirStructure = ['config', 'exmpl', 'sch', 'transl'];
+    private $dirStructure = ['exmpl', 'sch', 'transl'];
 
     private $dirMap = [];
     private $collcIndex = [];
@@ -58,9 +58,8 @@ class MedicisMap implements MedicisMap_i
         $groupPaths = glob($this->dirMap['src/collc'] . '*/', GLOB_ONLYDIR);
         foreach ($groupPaths as $groupPath) {
             $groupId = basename($groupPath);
-            $srcPaths = glob($groupPath . $groupId . '-*.json');
+            $srcPaths = glob($groupPath . '*.json');
             $distDirPaths = $this->groupDistPaths($groupId);
-            $this->collcMap[$groupId]['groupSrcConfig'] = $groupPath . $groupId . '.json';
             $this->collcMap[$groupId]['distDirPaths'] = $distDirPaths;
             $this->collcMap[$groupId]['groupDistPaths'] = $this->bundleDistPaths($groupId);
 
