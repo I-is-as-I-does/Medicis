@@ -3,9 +3,6 @@
 
 namespace SSITU\Medicis\MedicisFamily;
 
-use SSITU\Jack\Jack;
-
-
 class MedicisGroup implements MedicisGroup_i
 {
     private $MetaMedicis;
@@ -37,15 +34,15 @@ class MedicisGroup implements MedicisGroup_i
                 $bundle = [];
                 break;
             }
-            
+
             foreach ($collcBuild as $subDir => $buildRslt) {
-                if(!array_key_exists($subDir,$bundle)){
-                    $bundle[$subDir]= [];
+                if (!array_key_exists($subDir, $bundle)) {
+                    $bundle[$subDir] = [];
                 }
                 if (!array_key_exists($subDir . '-bundle', $errlog) && !array_key_exists('err', $buildRslt) && !array_key_exists('skipped', $buildRslt) && !array_key_exists('todo', $buildRslt)) {
                     $prc = $this->bundleContent($collcId, $subDir, $collcPaths['collcDistPaths']);
                     if (!array_key_exists('err', $prc)) {
-                        $bundle[$subDir] = array_merge_recursive($bundle[$subDir],$prc);
+                        $bundle[$subDir] = array_merge_recursive($bundle[$subDir], $prc);
                         continue;
                     } else {
                         $errlog[$subDir . '-bundle']['err'][] = $prc['err'];
@@ -83,22 +80,21 @@ class MedicisGroup implements MedicisGroup_i
 
     private function mergeRslt($bundleRslt, $errlog)
     {
-if (!empty($errlog)) {
-    
-           foreach ($errlog as $bundleK => $errdata) {
-            //$bundleRslt[$bundleK][] = $errdata;
+        if (!empty($errlog)) {
 
-               $flat = Jack::Arrays()->flatten($errdata);
-               $pile = [];
-               foreach($flat as $fk => $fdata){
-                    $k = trim(str_replace([0,1,2,3,4,5,6,7,8,9],'',$fk),'.');
+            foreach ($errlog as $bundleK => $errdata) {
+                //$bundleRslt[$bundleK][] = $errdata;
+
+                $flat = Jack\Array::flatten($errdata);
+                $pile = [];
+                foreach ($flat as $fk => $fdata) {
+                    $k = trim(str_replace([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], '', $fk), '.');
                     $pile[$k][] = $fdata;
-               }
-               foreach($pile as $kpile => $dpile){
-                $bundleRslt[$bundleK][$kpile] = PHP_EOL.implode(PHP_EOL,$dpile);
-               }
-               
-             
+                }
+                foreach ($pile as $kpile => $dpile) {
+                    $bundleRslt[$bundleK][$kpile] = PHP_EOL . implode(PHP_EOL, $dpile);
+                }
+
             }
         }
         return $bundleRslt;
@@ -106,7 +102,7 @@ if (!empty($errlog)) {
     private function prcBundleTransl($bundleTransl, $groupId)
     {
         $groupNameTransl = $this->MetaMedicis->getMedicisMember('Transl')->groupTranslBuild($groupId);
-       
+
         if (array_key_exists('err', $groupNameTransl)) {
             return ['err' => implode(PHP_EOL, $groupNameTransl['err'])];
         }
@@ -121,7 +117,6 @@ if (!empty($errlog)) {
 
         return $bundleTransl;
     }
-
 
     private function bundleContent($collcId, $subDir, $collcDistPaths)
     {

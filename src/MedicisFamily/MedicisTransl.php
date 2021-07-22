@@ -3,8 +3,6 @@
 
 namespace SSITU\Medicis\MedicisFamily;
 
-use SSITU\Jack\Jack;
-
 class MedicisTransl implements MedicisTransl_i
 {
 
@@ -42,7 +40,7 @@ class MedicisTransl implements MedicisTransl_i
         }
         $rslt = [];
         foreach ($this->translMap as $lang => $path) {
-            $content = Jack::File()->readJson($path);
+            $content = Jack\File::readJson($path);
             $doneStock = [];
             $saveFile = false;
             foreach ($translJob as $trslKey => $itemIds) {
@@ -75,7 +73,7 @@ class MedicisTransl implements MedicisTransl_i
                 $rslt['todo'][$lang] = implode("; ", $rslt['todo'][$lang]);
 
                 if ($saveFile) {
-                    $save = Jack::File()->saveJson($content, $path, true);
+                    $save = Jack\File::saveJson($content, $path, true);
                     if (array_key_exists('err', $save)) {
                         $rslt['err'][$lang]['file-update'] = $save['err'];
                     } else {

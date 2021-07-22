@@ -3,8 +3,6 @@
 
 namespace SSITU\Medicis\MedicisFamily;
 
-use SSITU\Jack\Jack;
-
 class MedicisModels implements MedicisModels_i
 {
     private $MedicisMap;
@@ -24,7 +22,7 @@ class MedicisModels implements MedicisModels_i
     {
         $prop = [];
         $prop['$id'] = "#/properties/" . $id;
-        $prop['title'] = Jack::Help()->UpCamelCase($id);
+        $prop['title'] = Jack\Help::UpCamelCase($id);
         $prop['type'] = 'array';
         $prop["uniqueItems"] = $unique;
         if (is_int($arrMinMax[1])) {
@@ -102,7 +100,7 @@ class MedicisModels implements MedicisModels_i
     {
         $prop = [];
         $prop['$id'] = "#/properties/" . $id;
-        $prop['title'] = Jack::Help()->UpCamelCase($id);
+        $prop['title'] = Jack\Help::UpCamelCase($id);
         $prop['type'] = 'object';
         $prop['additionalProperties'] = $adtProp;
         $prop['$ref'] = "#/definitions/" . $subSchemaId;
@@ -128,7 +126,7 @@ class MedicisModels implements MedicisModels_i
     {
         $prop = $this->baseArray($id, $arrMinMax);
         $prop["items"] = $this->UniqueRef($id . '/items', $refKey);
-        if (array_key_exists('err',$prop["items"])) {
+        if (array_key_exists('err', $prop["items"])) {
             return $prop["items"];
         }
 
@@ -176,7 +174,7 @@ class MedicisModels implements MedicisModels_i
     {
         $prop = [];
         $prop['$id'] = "#/properties/" . $id;
-        $prop['title'] = Jack::Help()->UpCamelCase($id);
+        $prop['title'] = Jack\Help::UpCamelCase($id);
         $prop['type'] = 'boolean';
         $prop["example"] = false;
         if ($default !== null) {
@@ -199,7 +197,7 @@ class MedicisModels implements MedicisModels_i
     {
         $prop = [];
         $prop['$id'] = "#/properties/" . $id;
-        $prop['title'] = Jack::Help()->UpCamelCase($id);
+        $prop['title'] = Jack\Help::UpCamelCase($id);
         $prop['type'] = 'string';
 
         $prop['example'] = $example;
@@ -257,7 +255,7 @@ class MedicisModels implements MedicisModels_i
 
     public function Timezone($id = 'timezone')
     {
-        $enumList = Jack::Time()->timezonesList();
+        $enumList = Jack\Time::timezonesList();
         return $this->StringWithEnum($id, $enumList);
     }
 
@@ -285,7 +283,7 @@ class MedicisModels implements MedicisModels_i
     {
         $prop = [];
         $prop['$id'] = "#/properties/" . $id;
-        $prop['title'] = Jack::Help()->UpCamelCase($id);
+        $prop['title'] = Jack\Help::UpCamelCase($id);
         $prop['type'] = 'number';
 
         if (is_int($MinMax[0])) {
@@ -330,7 +328,7 @@ class MedicisModels implements MedicisModels_i
         $escFilename = str_replace('-', '\-', $refKey);
         $prop = [];
         $prop['$id'] = "#/properties/" . $id;
-        $prop['title'] = Jack::Help()->UpCamelCase($id);
+        $prop['title'] = Jack\Help::UpCamelCase($id);
         $prop["type"] = 'object';
         $prop["additionalProperties"] = false;
 

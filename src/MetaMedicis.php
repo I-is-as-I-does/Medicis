@@ -3,9 +3,8 @@
 
 namespace SSITU\Medicis;
 
-use SSITU\Jack\Jack;
-
-class MetaMedicis implements MetaMedicis_i {
+class MetaMedicis implements MetaMedicis_i
+{
     private $MedicisMap;
 
     private $MedicisSchema;
@@ -73,7 +72,7 @@ class MetaMedicis implements MetaMedicis_i {
             $path = $this->MedicisMap->getDistPath($PathOrId, $dirKey, false, $lang);
         }
         if (!empty($path) && is_file($path)) {
-            $content = Jack::File()->readJson($path);
+            $content = Jack\File::readJson($path);
             if (!empty($content)) {
                 return $content;
             }
@@ -87,7 +86,7 @@ class MetaMedicis implements MetaMedicis_i {
         if ($path === false) {
             return ['err' => 'Unvalid Id "' . $Id . '" or sub directory "' . $subDir . '"'];
         }
-        return Jack::File()->saveJson($content, $path, true);
+        return Jack\File::saveJson($content, $path, true);
     }
 
 }

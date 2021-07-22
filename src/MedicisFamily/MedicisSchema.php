@@ -3,9 +3,8 @@
 
 namespace SSITU\Medicis\MedicisFamily;
 
-use SSITU\Jack\Jack;
-
-class MedicisSchema implements MedicisSchema_i {
+class MedicisSchema implements MedicisSchema_i
+{
 
     private $MetaMedicis;
     private $MedicisModels;
@@ -15,7 +14,7 @@ class MedicisSchema implements MedicisSchema_i {
     {
         $this->MetaMedicis = $MetaMedicis;
         $this->MedicisModels = $MetaMedicis->getMedicisMember('Models');
-        $this->MedicisMap =  $MetaMedicis->getMedicisMap();
+        $this->MedicisMap = $MetaMedicis->getMedicisMap();
     }
 
     public function schBuild($collcId, $src = [])
@@ -41,7 +40,7 @@ class MedicisSchema implements MedicisSchema_i {
     private function subschWrap($id)
     {
         return ['$id' => "#/properties/" . $id,
-            'title' => Jack::Help()->UpCamelCase($id),
+            'title' => Jack\Help::UpCamelCase($id),
         ];
     }
 
@@ -69,8 +68,8 @@ class MedicisSchema implements MedicisSchema_i {
     }
 
     private function prcProperties($src, $subSrc = false)
-    {       $job = $src;
-        if($subSrc !== false){
+    {$job = $src;
+        if ($subSrc !== false) {
             $job = $subSrc;
         }
         if (empty($job['props']) || !is_array($job['props'])) {
@@ -104,7 +103,7 @@ class MedicisSchema implements MedicisSchema_i {
                 return $prc;
             }
             $build["props"][$id] = $prc;
-            if (in_array($method,['ObjectsArray','SubObject'])) {
+            if (in_array($method, ['ObjectsArray', 'SubObject'])) {
                 $subPrc = $this->prcSubProperties($src, $build['defs'], $id, $argm);
                 if (array_key_exists('err', $subPrc)) {
                     return $subPrc;
